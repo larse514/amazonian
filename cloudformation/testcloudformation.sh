@@ -16,7 +16,7 @@ alblistener=`aws cloudformation describe-stacks --stack-name "${ecstemplate}" --
 
 #package and deploy an instance
 aws cloudformation package --template-file cloudformation/hellocontainer.yml --output-template-file hellocontainer-output.yml --s3-bucket circleci.deployables
-aws cloudformation deploy --template-file hellocontainer-output.yml --capabilities CAPABILITY_IAM --stack-name "${moodle1}" --parameter-overrides VpcId=vpc-c7aa77be Priority=1 ecscluster="${ecscluster}" ecslbarn="${ecslbarn}" ecslbdnsname="${ecslbdnsname}"	 ecslbhostedzoneid="${ecslbhostedzoneid}" alblistener="${alblistener}" HostedZoneName=vssdevelopment.com  ClientName=hello 
+aws cloudformation deploy --template-file hellocontainer-output.yml --capabilities CAPABILITY_IAM --stack-name "${moodle1}" --parameter-overrides VpcId=vpc-c7aa77be Priority=1 ecscluster="${ecscluster}" ecslbarn="${ecslbarn}" ecslbdnsname="${ecslbdnsname}"	 ecslbhostedzoneid="${ecslbhostedzoneid}" alblistener="${alblistener}" HostedZoneName=vssdevelopment.com  ServiceName=hello ContainerName=hello
 #just send basic test
 sleep 15
 curl --fail https://hello.vssdevelopment.com/
