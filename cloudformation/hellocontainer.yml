@@ -97,7 +97,7 @@ Resources:
         MinimumHealthyPercent: 0
       LoadBalancers:
       - ContainerName: !Ref ContainerName
-        ContainerPort: '80'
+        ContainerPort: 8484
         TargetGroupArn: !Ref ECSTARGRP
       Role: !Ref 'ECSServiceRole'
       TaskDefinition: !Ref 'taskdefinition'
@@ -113,7 +113,7 @@ Resources:
         Cpu: "50"
         PortMappings:
           -
-            ContainerPort: 8484 # todo- use ref of something?
+            ContainerPort: 8484 
         Memory: "500"
         Essential: "true"    
 
