@@ -17,7 +17,7 @@ test:
        timeout: 1800
 
   post: 
-    - sh ./cleanup.sh test-ecs-helloworld hello-stack
+    - sh ./cloudformation/cleanup.sh test-ecs-helloworld hello-stack
 
 deployment: 
   development: 
