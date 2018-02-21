@@ -12,8 +12,9 @@ test:
   pre: 
     - aws cloudformation validate-template --template-body file://cloudformation/ecs.yml
     - aws cloudformation validate-template --template-body file://cloudformation/hellocontainer.yml
-    - sh ./testcloudformation.sh test-ecs-helloworld:
+    - sh ./cloudformation/testcloudformation.sh test-ecs-helloworld:
        timeout: 1800
+
   # post: 
   #   - sh ./cleanup.sh test-ecs-helloworld
 
