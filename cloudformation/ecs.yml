@@ -93,8 +93,8 @@ Resources:
     Properties:
       GroupId: !Ref 'HttpSecurityGroup'
       IpProtocol: tcp
-      FromPort: '80'
-      ToPort: '80'
+      FromPort: '0'
+      ToPort: '65535'
       SourceSecurityGroupId: !Ref 'HttpSecurityGroup'
 
   WebSecurityGroup:
@@ -176,7 +176,7 @@ Resources:
       Name: "DEFAULTTRGGRP"
       Port: 80
       Matcher:
-        HttpCode: '303'
+        HttpCode: '200'
       Protocol: HTTP
       UnhealthyThresholdCount: 2
       TargetGroupAttributes:
