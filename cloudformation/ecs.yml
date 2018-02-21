@@ -173,7 +173,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
-      Name: "DEFAULT"
+      Name: "DEFAULTTRGGRP"
       Port: 80
       Matcher:
         HttpCode: '303'
