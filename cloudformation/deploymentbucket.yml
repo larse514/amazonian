@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template deploymentbucket'
+Parameters:
+  S3BucketName:
+    Type: String
+    
+Resources:
+  #todo- create backup bucket and policy
+  DeploymentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: S3BucketName
+Outputs:
+  DeploymentBucket:
+    Description: Deployment bucket to version cf templates
+    Value: !Ref DeploymentBucket
