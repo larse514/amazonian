@@ -1,0 +1,204 @@
+#usage:
+#aws cloudformation package --template-file moodletenant.yml --output-template-file moodletenant-output.yml --s3-bucket circleci.deployables
+#aws cloudformation deploy --template-file moodletenant-output.yml --capabilities CAPABILITY_IAM --stack-name moodle-ecs-single --parameter-overrides VpcId=vpc-c7aa77be ecscluster=moodle-ecs-single-ECSCluster-1GO8PSGOCUMFY ecslbarn=arn:aws:elasticloadbalancing:us-east-1:417615409974:targetgroup/ECSTARGRP/08e87065c62e095a ecslbdnsname=ECSLB-931880790.us-east-1.elb.amazonaws.com alblistener=value ecslbhostedzoneid=Z35SXDOTRQ7X7K HostedZoneName=vssdevelopment.com. DockerRespository=vernonsoftwaresolutions/moodlesingleinstance ServiceName=bradlarsen
+
+#vpc-c7aa77be
+#subnet-b61d81fe,subnet-0202dc58
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ServiceName:
+    Type: String
+    Description: Name of container
+  ContainerName:
+    Type: String
+    Description: Name of container
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select a VPC that allows instances access to the Internet.
+  Priority:
+    Type: Number
+    Description: ALB rule priority number
+  HostedZoneName:
+    Type: String
+    Description:  Hosted zone name
+  ecslbhostedzoneid:
+    Type: String
+    Description: Elastic Load Balancer Canonincal Hosted Zone Id
+  ecslbdnsname:
+    Type: String
+    Description: Elastic Load Balancer DNS Name
+  ecslbarn:
+    Type: String
+    Description: Elastic Load Balancer ARN
+  ecscluster:
+    Type: String
+    Description: ECS Cluster
+  alblistener:
+    Type: String
+    Description: ALB listener arn
+
+Resources:
+
+  # Record Set for moodle instance
+  ServiceDNS:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneName: !Join [".", [ !Ref HostedZoneName , ""]]
+        Comment: Zone apex alias targeted to Gitlab.
+        RecordSets:
+        - Name:
+            !Join [".", [ !Ref ServiceName , !Ref HostedZoneName]]
+          Type: A
+          AliasTarget:
+            HostedZoneId: !Ref ecslbhostedzoneid
+            DNSName: !Ref ecslbdnsname
+
+  #todo- remove this?
+  ECSLBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+      - Type: forward
+        TargetGroupArn: !Ref 'ECSTARGRP'
+      Conditions:
+      - Field: host-header
+        Values:
+        - !Join [".", [ !Ref ServiceName , !Ref HostedZoneName]]
+      ListenerArn: !Ref 'alblistener'
+      Priority: !Ref Priority
+  ECSTARGRP:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Name: !Ref ServiceName
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HttpCode: '303'
+      UnhealthyThresholdCount: 2
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: '20'
+      VpcId: !Ref 'VpcId'
+
+  service:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - ServiceDNS
+    Properties:
+      Cluster: !Ref 'ecscluster'
+      DesiredCount: '1'
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 0
+      LoadBalancers:
+      - ContainerName: !Ref ContainerName
+        ContainerPort: '80'
+        TargetGroupArn: !Ref ECSTARGRP
+      Role: !Ref 'ECSServiceRole'
+      TaskDefinition: !Ref 'taskdefinition'
+
+  taskdefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join ['', [!Ref 'AWS::StackName', -ecs]]
+      ContainerDefinitions:
+      -
+        Name: !Ref ContainerName
+        Image: willejs/go-hello-world
+        Cpu: "50"
+        PortMappings:
+          -
+            ContainerPort: 8484 # todo- use ref of something?
+        Memory: "500"
+        Essential: "true"    
+
+  ECSServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['elasticloadbalancing:DeregisterInstancesFromLoadBalancer', 'elasticloadbalancing:DeregisterTargets',
+              'elasticloadbalancing:Describe*', 'elasticloadbalancing:RegisterInstancesWithLoadBalancer',
+              'elasticloadbalancing:RegisterTargets', 'ec2:Describe*', 'ec2:AuthorizeSecurityGroupIngress']
+            Resource: '*'
+
+  ServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: service
+    Properties:
+      MaxCapacity: 2
+      MinCapacity: 1
+      ResourceId: !Join ['', [service/, !Ref 'ecscluster', /, !GetAtt [service, Name]]]
+      RoleARN: !GetAtt [AutoscalingRole, Arn]
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  ServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: AStepPolicy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref 'ServiceScalingTarget'
+      StepScalingPolicyConfiguration:
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 60
+        MetricAggregationType: Average
+        StepAdjustments:
+        - MetricIntervalLowerBound: 0
+          ScalingAdjustment: 200
+
+  AutoscalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [application-autoscaling.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: service-autoscaling
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['application-autoscaling:*', 'cloudwatch:DescribeAlarms', 'cloudwatch:PutMetricAlarm',
+              'ecs:DescribeServices', 'ecs:UpdateService']
+            Resource: '*'
+
+  ALB500sAlarmScaleUp:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      EvaluationPeriods: '1'
+      Statistic: Average
+      Threshold: '10'
+      AlarmDescription: Alarm if our ALB generates too many HTTP 500s.
+      Period: '60'
+      AlarmActions: [!Ref 'ServiceScalingPolicy']
+      Namespace: AWS/ApplicationELB
+      Dimensions:
+      - Name: ECSService
+        Value: !Ref 'service'
+      ComparisonOperator: GreaterThanThreshold
+      MetricName: HTTPCode_ELB_5XX_Count
+
+  #CloudwatchLogsGroup:
+  #  Type: AWS::Logs::LogGroup
+  #  Properties:
+  #    LogGroupName: !Join ['-', [ECSLogGroup, !Ref 'AWS::StackName']]
+  #    RetentionInDays: 14

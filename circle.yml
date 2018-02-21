@@ -1,0 +1,25 @@
+--- 
+machine: 
+  services: 
+    - docker
+
+dependencies: 
+  override: 
+    - "aws configure set default.region us-east-1"
+    - "aws configure set default.output json"
+
+test: 
+  pre: 
+    - aws cloudformation validate-template --template-body file://cloudformation/ecs.yml
+    - aws cloudformation validate-template --template-body file://cloudformation/hellocontainer.yml
+    - sh ./testcloudformation.sh test-ecs-helloworld:
+       timeout: 1800
+  # post: 
+  #   - sh ./cleanup.sh test-ecs-helloworld
+
+# deployment: 
+#   development: 
+#     branch: master
+#     commands: 
+#       # - aws s3 cp cloudformation/ecs.yml s3://moodle.templates/ecs/ecs.yml
+#       # - aws s3 cp cloudformation/moodle_tenant.yml s3://moodle.templates/ecstenant/moodle_tenant.yml
