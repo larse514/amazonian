@@ -17,5 +17,5 @@ workdir/contacts: $(GOFILES)
 test: test-all
 
 test-all:
-	echo $(GOPACKAGES)
-	@go test -v $(GOPACKAGES)
+	#@go test -v $(GOFILES)
+	@go test -v ./...
