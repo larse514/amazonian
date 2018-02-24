@@ -1,4 +1,5 @@
 GOFILES = $(shell find . -name '*.go' -not -path './vendor/*')
+GOPACKAGES = $(shell go list ./...  | grep -v /amazonian/)
 
 default: build
 
@@ -16,4 +17,4 @@ workdir/contacts: $(GOFILES)
 test: test-all
 
 test-all:
-	@go test -v ./...
+	@go test -v $(GOPACKAGES)
