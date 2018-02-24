@@ -20,10 +20,12 @@ func main() {
 	elbARNPtr := flag.String("ELBARN", "", "ELBARN used to reference load balancer. (Required)")
 	clusterArnPtr := flag.String("ClusterARN", "", "ARN of Cluster to be used to run containers. (Required)")
 	albListernArnPtr := flag.String("ALBListenerARN", "", "ALB Listener Arn. (Required)")
+	image := flag.String("Image", "", "Docker Repository Image (Required)")
+
 	//parse the values
 	flag.Parse()
 	//validate arguments
-	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *hostedZonePtr, *elbHostedZoneIDPtr, *elbDNSNamePtr, *elbARNPtr, *clusterArnPtr, *albListernArnPtr)
+	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *hostedZonePtr, *elbHostedZoneIDPtr, *elbDNSNamePtr, *elbARNPtr, *clusterArnPtr, *albListernArnPtr, *image)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
