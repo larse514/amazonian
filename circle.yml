@@ -1,5 +1,8 @@
 --- 
 machine: 
+  environment:
+    ECS_STACK_NAME: amazonian-ecs
+    STACK_NAME: amazonian
   services: 
     - docker
 
@@ -13,11 +16,11 @@ test:
     - aws cloudformation validate-template --template-body file://cloudformation/ecs.yml
     - aws cloudformation validate-template --template-body file://cloudformation/hellocontainer.yml
     - aws cloudformation validate-template --template-body file://cloudformation/deploymentbucket.yml
-    - sh ./cloudformation/testcloudformation.sh test-ecs-helloworld hello-stack:
+    - sh ./cloudformation/testcloudformation.sh ${ECS_STACK_NAME} ${STACK_NAME}:
        timeout: 1800
 
-  post: 
-    - sh ./cloudformation/cleanup.sh test-ecs-helloworld hello-stack
+  # post: 
+  #   - sh ./cloudformation/cleanup.sh ${ECS_STACK_NAME} ${STACK_NAME}
 
 deployment: 
   development: 
