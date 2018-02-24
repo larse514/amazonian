@@ -1,11 +1,12 @@
 package main
 
 import (
-	"amazonian/cloudformation"
-	"amazonian/commandlineargs"
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/larse514/amazonian/cloudformation"
+	"github.com/larse514/amazonian/commandlineargs"
 )
 
 func main() {
