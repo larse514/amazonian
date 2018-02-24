@@ -6,7 +6,8 @@ jobs:
       - image: circleci/golang:1.8
     # environment:
     #   - BUCKET_NAME: "moodle.sites.lambda.deployment"
-
+    environment:
+      TEST_RESULTS: /tmp/test-results
     steps:
     - checkout
     - run: mkdir -p $TEST_RESULTS
