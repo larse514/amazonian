@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/MoodleSites
+    working_directory: ~/amazonian
     docker:
       - image: circleci/golang:1.8
     # environment:
