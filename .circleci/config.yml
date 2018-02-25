@@ -23,7 +23,6 @@ jobs:
     # - run: go get github.com/jstemmer/go-junit-report
     - run: go get github.com/aws/aws-sdk-go/service/cloudformation
 
-  
     - run:
         name: Run unit tests
         # environment:
@@ -36,8 +35,8 @@ jobs:
     - run: 
         name: Configure AWS environment
         command: |
-          "aws configure set default.region us-east-1"
-          "aws configure set default.output json"
+          aws configure set default.region us-east-1
+          aws configure set default.output json
 
     - run:
         name: Run integration tests
