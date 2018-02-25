@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	vpcParam             = "VpcId"
+	//ECS Container Service consts
 	priorityParam        = "Priority"
 	hostedZoneNameParam  = "HostedZoneName"
 	eLBHostedZoneIDParam = "ecslbhostedzoneid"
@@ -16,6 +16,16 @@ const (
 	imageParam           = "image"
 	serviceNameParam     = "ServiceName"
 	containerNameParam   = "ContainerName"
+
+	//ecs cluster consts
+	domainNameParam      = "DomainName"
+	keyNameParam         = "KeyName"
+	subnetIDParam        = "SubnetId"
+	desiredCapacityParam = "DesiredCapacity"
+	maxSizeParam         = "MaxSize"
+	instanceTypeParam    = "InstanceType"
+	//shared consts
+	vpcParam = "VpcId"
 
 	//export param names
 	clusterArn      = "ecscluster"
@@ -47,6 +57,18 @@ func createCloudformationParameters(parameterMap map[string]string) []*cloudform
 	return parameters
 }
 
+//EcsCluster is a struct which defines required files for an ECS Cluster
+type EcsCluster struct {
+	DomainName      string
+	KeyName         string
+	VpcID           string
+	SubnetIDs       string
+	DesiredCapacity string
+	MaxSize         string
+	//todo- could make this first class citizen
+	InstanceType string
+}
+
 //EcsService is a struct which defines required fields for an ECS Service
 type EcsService struct {
 	Vpc            string
@@ -55,6 +77,24 @@ type EcsService struct {
 	Image          string
 	ServiceName    string
 	ContainerName  string
+}
+
+//CreateClusterParameters will create the Parameter list to generate an ecs cluster
+//todo- unit tests!!!
+func CreateClusterParameters(cluster EcsCluster) []*cloudformation.Parameter {
+	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
+	//we do as such first by converting everything to a key value map
+	//key being the CF Param name, value is the value to provide to the cloudformation template
+	parameterMap := make(map[string]string, 0)
+	parameterMap[vpcParam] = cluster.VpcID
+	parameterMap[domainNameParam] = cluster.DomainName
+	parameterMap[keyNameParam] = cluster.KeyName
+	parameterMap[subnetIDParam] = cluster.SubnetIDs
+	parameterMap[desiredCapacityParam] = cluster.DesiredCapacity
+	parameterMap[maxSizeParam] = cluster.MaxSize
+	parameterMap[instanceTypeParam] = cluster.InstanceType
+	return createCloudformationParameters(parameterMap)
+
 }
 
 //CreateServiceParameters will create the Parameter list to generate a cluster service

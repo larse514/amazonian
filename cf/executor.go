@@ -33,6 +33,7 @@ func (executor CFExecutor) CreateStack() error {
 	input.SetCapabilities(createCapability())
 
 	fmt.Println("about to create stack with parameters: ", input)
+	//todo-refactor to return output
 	_, err := executor.Client.CreateStack(input)
 	//if there's an error return it
 	if err != nil {

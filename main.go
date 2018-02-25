@@ -48,6 +48,11 @@ func main() {
 	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", "", "Name ECS Cluster to use (Required)")
 	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists, defaults to false if not provided (Required)")
+	subnetPrt := flag.String("Subnets", "", "List of VPC Subnets to deploy cluster to. (Required only if clusterExists is false)")
+	keyNamePrt := flag.String("KeyName", "", "Key name to use for cluster. (Required only if clusterExists is false)")
+	cluserSizePrt := flag.String("ClusterSize", "1", "Number of host machines for cluster. (Required only if clusterExists is false)")
+	mazSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to. (Required only if clusterExists is false)")
+	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 
 	//parse the values
 	flag.Parse()
@@ -72,12 +77,27 @@ func main() {
 	//(note that for the time being only ECS is supported)
 	serviceStruct := cf.EcsService{Vpc: *vpcPtr, Priority: *priorityPtr, Image: *imagePtr, ServiceName: *serviceNamePtr, ContainerName: *containerNamePtr, HostedZoneName: *hostedZonePtr}
 
+	ecs := cluster.Ecs{}
 	//check if the cluster exists, if not create it
 	if !*clusterExistsPtr {
-		println("About to create cluster")
+		println("About to create cluster in subnets ", *subnetPrt)
+
+		//for now lets hardcode the ECSCluster params
+		//todo-refactor to not one giant line
+		clusterStruct := cf.EcsCluster{DomainName: *hostedZonePtr, KeyName: *keyNamePrt, VpcID: *vpcPtr, SubnetIDs: *subnetPrt, DesiredCapacity: *cluserSizePrt, MaxSize: *mazSizePrt, InstanceType: *instanceTypePrt}
+		//create the parameters
+		clusterParams := cf.CreateClusterParameters(clusterStruct)
+		//initialize executor to create the cluster
+		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: containerTemplateURL, Parameters: clusterParams}}
+		//create cluster
+		err := ecs.CreateCluster(*clusterNamePtr)
+		if err != nil {
+			println("error creating cluster ", err.Error())
+			os.Exit(1)
+		}
 	}
-	//initialize ecs to retrieve clsuter
-	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}}
+	//initialize ecs to retrieve cluster
+	ecs = cluster.Ecs{Resource: cf.Stack{Client: svc}}
 
 	//now get the cluster based on the stack name provided
 	ecs, err = ecs.GetCluster(*clusterNamePtr)

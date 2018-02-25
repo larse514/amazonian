@@ -52,5 +52,20 @@ func (ecs Ecs) GetOutputParameters() map[string]string {
 
 //CreateCluster will create an ECS cluster
 func (ecs Ecs) CreateCluster(clusterName string) error {
+	ecs.StackName = clusterName
+
+	//create the stack
+	err := ecs.Executor.CreateStack()
+	if err != nil {
+		println("Error processing create stack request ", err.Error())
+		return err
+	}
+	//then wait
+	err = ecs.Executor.PauseUntilFinished()
+	if err != nil {
+		println("Error while attempting to wait for stack to finish processing ", err.Error())
+		return err
+	}
+
 	return nil
 }

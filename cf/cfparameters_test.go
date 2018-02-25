@@ -114,3 +114,17 @@ func TestCreateCloudformationParameters2ParametersBothValueAreCorrect(t *testing
 		t.Fail()
 	}
 }
+
+//CreateClusterParameters tests
+func TestCreateClusterParameters(t *testing.T) {
+	cluster := EcsCluster{DomainName: "DOMAINAME"}
+
+	params := CreateClusterParameters(cluster)
+
+	if *params[0].ParameterKey != "DomainName" {
+		t.Log("paramkey ", params[0].ParameterKey, " did not get set to correct constant value")
+	}
+	if *params[0].ParameterValue != "DOMAINAME" {
+		t.Log("paramvalue ", params[0].ParameterValue, " did not get set to correct constant value")
+	}
+}
