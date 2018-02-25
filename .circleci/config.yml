@@ -41,9 +41,11 @@ jobs:
     - run:
         name: Run integration tests
         command: |
-          chmod +x integration.sh
-          ./integration.sh
-
+          chmod +x existing_cluster_integration.sh
+          ./existing_cluster_integration.sh
+          
+          chmod +x create_cluster_integration.sh
+          ./create_cluster_integration.sh
     - save_cache:
         key: v1-pkg-cache
         paths:

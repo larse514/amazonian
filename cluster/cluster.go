@@ -31,7 +31,6 @@ func (ecs Ecs) GetCluster(stackName string) (Ecs, error) {
 		println("error retrieving stack ", err.Error())
 		return ecs, err
 	}
-	println("fetched stack ", stack.GoString())
 	ecs.stack = stack
 
 	return ecs, nil
@@ -41,9 +40,7 @@ func (ecs Ecs) GetCluster(stackName string) (Ecs, error) {
 func (ecs Ecs) GetOutputParameters() map[string]string {
 
 	outputMap := make(map[string]string, 0)
-	println("about to convert outputs from ", ecs.stack.GoString())
 	for _, output := range ecs.stack.Outputs {
-		println("output ", output.GoString())
 		outputMap[*output.ExportName] = *output.OutputValue
 	}
 

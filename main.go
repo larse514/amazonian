@@ -88,7 +88,7 @@ func main() {
 		//create the parameters
 		clusterParams := cf.CreateClusterParameters(clusterStruct)
 		//initialize executor to create the cluster
-		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: containerTemplateURL, Parameters: clusterParams}}
+		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: ecsTemplateURL, Parameters: clusterParams}}
 		//create cluster
 		err := ecs.CreateCluster(*clusterNamePtr)
 		if err != nil {
