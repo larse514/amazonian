@@ -59,12 +59,14 @@ func main() {
 	// Initialize a session that the SDK uses to load
 	// credentials from the shared credentials file ~/.aws/credentials
 	// and configuration from the shared configuration file ~/.aws/config.
+	// or environment variables
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 	// Create CloudFormation client in region
 	svc := cloudformation.New(sess)
-	//create the service struct
+	//create the service struct, this is the struct that defines everything we need to create a container service
+	//(note that for the time being only ECS is supported)
 	serviceStruct := ecsService{vpc: *vpcPtr, priority: *priorityPtr, image: *imagePtr, serviceName: *serviceNamePtr, containerName: *containerNamePtr, hostedZoneName: *hostedZonePtr}
 	//initialize ecs to retrieve clsuter
 	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}}
@@ -78,10 +80,10 @@ func main() {
 	}
 	//Grab the output parameters form the ECS Cluster that was just fetched
 	ecsParameters := ecs.GetOutputParameters()
+
 	//now we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
-	//key being the CF Param name, value is the value to provide
-
+	//key being the CF Param name, value is the value to provide to the cloudformation template
 	parameterMap := CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
 	//now convert the key value map to a list of cloudformation.Parameter 's
 	parameters := cf.CreateCloudformationParameters(parameterMap)
