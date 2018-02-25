@@ -1,4 +1,4 @@
-package cloudformation
+package cf
 
 import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -8,7 +8,6 @@ import (
 //key value pairs into AWS Parameters
 func CreateCloudformationParameters(parameterMap map[string]string) []*cloudformation.Parameter {
 	//initialize parameter slice
-
 	parameters := make([]*cloudformation.Parameter, 0)
 
 	//loop over the map and create a parameter object, then add it to the slice

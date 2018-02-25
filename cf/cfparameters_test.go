@@ -1,4 +1,4 @@
-package cloudformation
+package cf
 
 import "testing"
 

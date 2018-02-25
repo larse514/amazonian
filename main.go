@@ -9,6 +9,18 @@ import (
 	"github.com/larse514/amazonian/commandlineargs"
 )
 
+const (
+	vpcParam             = "VPC"
+	priorityParam        = "Priority"
+	hostedZoneNameParam  = "HostedZoneName"
+	eLBHostedZoneIDParam = "ELBHostedZoneId"
+	eLBDNSNameParam      = "ELBDNSName"
+	eLBARNParam          = "ELBARN"
+	clusterARNParam      = "ClusterARN"
+	aLBListenerARNParam  = "ALBListenerARN"
+	imageParam           = "Image"
+)
+
 func main() {
 	//get command line args
 	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
@@ -21,7 +33,6 @@ func main() {
 	clusterArnPtr := flag.String("ClusterARN", "", "ARN of Cluster to be used to run containers. (Required)")
 	albListernArnPtr := flag.String("ALBListenerARN", "", "ALB Listener Arn. (Required)")
 	image := flag.String("Image", "", "Docker Repository Image (Required)")
-
 	//parse the values
 	flag.Parse()
 	//validate arguments
@@ -31,6 +42,18 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+	//just brute force create the map we need, todo- probably refactor to a file we read in?
+	parameterMap := make(map[string]string, 0)
+
+	parameterMap[vpcParam] = *vpcPtr
+	parameterMap[priorityParam] = *priorityPtr
+	parameterMap[hostedZoneNameParam] = *hostedZonePtr
+	parameterMap[eLBHostedZoneIDParam] = *elbHostedZoneIDPtr
+	parameterMap[eLBDNSNameParam] = *elbDNSNamePtr
+	parameterMap[eLBARNParam] = *elbARNPtr
+	parameterMap[clusterARNParam] = *clusterArnPtr
+	parameterMap[aLBListenerARNParam] = *albListernArnPtr
+	parameterMap[imageParam] = *image
 
 	fmt.Printf("textPtr: %s", *vpcPtr)
 	// cloudformation.ListStacks()

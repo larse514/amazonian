@@ -1,4 +1,4 @@
-package cloudformation
+package cf
 
 import (
 	"errors"
@@ -33,7 +33,7 @@ func (m *mockBadCloudFormationClient) CreateStack(*cloudformation.CreateStackInp
 	return nil, errors.New("Bad Error")
 }
 func TestCloudformationCreateStack(t *testing.T) {
-	executor := cfExecutor{client: &mockGoodCloudFormationClient{}, stackName: stackName, templateURL: templateURL, parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
 
 	err := executor.CreateStack()
 	if err != nil {
@@ -44,7 +44,7 @@ func TestCloudformationCreateStack(t *testing.T) {
 }
 
 func TestCloudformationCreateStackFails(t *testing.T) {
-	executor := cfExecutor{client: &mockBadCloudFormationClient{}, stackName: stackName, templateURL: templateURL, parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
 
 	err := executor.CreateStack()
 	if err == nil {
@@ -65,7 +65,7 @@ func (m *mockBadCloudFormationClient) WaitUntilStackCreateComplete(*cloudformati
 }
 
 func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
-	executor := cfExecutor{client: &mockGoodCloudFormationClient{}, stackName: stackName, templateURL: templateURL, parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
 
 	err := executor.PauseUntilFinished()
 	if err != nil {
@@ -75,7 +75,7 @@ func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 
 }
 func TestCloudformationWaitUntilStackCreateCompleteFails(t *testing.T) {
-	executor := cfExecutor{client: &mockBadCloudFormationClient{}, stackName: stackName, templateURL: templateURL, parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
 
 	err := executor.PauseUntilFinished()
 	if err == nil {
