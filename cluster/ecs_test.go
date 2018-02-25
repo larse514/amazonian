@@ -44,7 +44,7 @@ func (m mockBadResource) GetStack(stackName *string) (cloudformation.Stack, erro
 }
 func createStack(numOutputs int, stackName string) *cloudformation.Stack {
 	output := cloudformation.Output{}
-	output.SetOutputKey("ecscluster-" + stackName)
+	output.SetExportName("ecscluster-" + stackName)
 	output.SetOutputValue(stackValue)
 	outputs := make([]*cloudformation.Output, 0)
 
@@ -63,7 +63,7 @@ func TestEcsGetCluster(t *testing.T) {
 	ecs := Ecs{Resource: mockGoodResource{}}
 
 	ecs, _ = ecs.GetCluster(stackName)
-	if *ecs.stack.Outputs[0].OutputKey != "ecscluster-STACKNAME" {
+	if *ecs.stack.Outputs[0].ExportName != "ecscluster-STACKNAME" {
 		t.Log("mismatch in output key ", ecs.stack.GoString())
 		t.Fail()
 	}
@@ -78,7 +78,7 @@ func TestEcsGetClusterGetParameters(t *testing.T) {
 	ecs := Ecs{Resource: mockGoodResource{}}
 
 	ecs, _ = ecs.GetCluster(stackName)
-	if *ecs.stack.Outputs[0].OutputKey != "ecscluster-STACKNAME" {
+	if *ecs.stack.Outputs[0].ExportName != "ecscluster-STACKNAME" {
 		t.Log("mismatch in output key ", ecs.stack.GoString())
 		t.Fail()
 	}
@@ -87,7 +87,7 @@ func TestEcsGetClusterGetParameters(t *testing.T) {
 		t.Fail()
 	}
 	paramMap := ecs.GetOutputParameters()
-
+	println("here")
 	if paramMap["ecscluster-STACKNAME"] != stackValue {
 		t.Log("Param map incorrectly created ", paramMap)
 		t.Fail()
