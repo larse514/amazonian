@@ -56,11 +56,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Set stack name, template url
 	// Initialize a session that the SDK uses to load
 	// credentials from the shared credentials file ~/.aws/credentials
 	// and configuration from the shared configuration file ~/.aws/config.
-	//todo-maybe meove this out even further
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
