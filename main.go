@@ -43,7 +43,6 @@ func main() {
 	priorityPtr := flag.String("Priority", "", "Priority use in Target Group Rules. (Required)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
-	stackNamePtr := flag.String("StackName", "", "Name of aws cloudformation stack (Required)")
 	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
 	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", "", "Name ECS Cluster to use (Required)")
@@ -57,7 +56,7 @@ func main() {
 	//parse the values
 	flag.Parse()
 	//validate arguments
-	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *imagePtr, *imagePtr, *stackNamePtr, *serviceNamePtr, *containerNamePtr, *clusterNamePtr)
+	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *imagePtr, *imagePtr, *serviceNamePtr, *containerNamePtr, *clusterNamePtr)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
@@ -113,7 +112,7 @@ func main() {
 	parameters := cf.CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
 
 	//initialize the thing that will actually create the stack
-	containerExecutor := cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: containerTemplateURL, Parameters: parameters}
+	containerExecutor := cf.CFExecutor{Client: svc, StackName: *serviceNamePtr, TemplateURL: containerTemplateURL, Parameters: parameters}
 	//take the executor and initialize the ECS Servie
 	//todo-this very badly needs to be renamed
 	serv := service.ECSService{Executor: containerExecutor}
