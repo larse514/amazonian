@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/larse514/amazonian
     docker:
-      - image: circleci/golang:1.8
+      - image: spbk/circleci-golang:latest
     # environment:
     #   - BUCKET_NAME: "moodle.sites.lambda.deployment"
     environment:
