@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	// "github.com/larse514/amazonian/cloudformation"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/cf"
@@ -39,14 +38,8 @@ const (
 func main() {
 	//get command line args
 	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
-	//todo-remove this and add dynamic lookup
 	priorityPtr := flag.String("Priority", "", "Priority use in Target Group Rules. (Required)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
-	// elbHostedZoneIDPtr := flag.String("ELBHostedZoneId", "", "ELBHostedZoneId used to lookup dns entry of loadbalancer for DNS entries. (Required)")
-	// elbDNSNamePtr := flag.String("ELBDNSName", "", "ELBDNSName used to lookup dns entry of loadbalancer for DNS entries. (Required)")
-	// elbARNPtr := flag.String("ELBARN", "", "ELBARN used to reference load balancer. (Required)")
-	// clusterArnPtr := flag.String("ClusterARN", "", "ARN of Cluster to be used to run containers. (Required)")
-	// albListernArnPtr := flag.String("ALBListenerARN", "", "ALB Listener Arn. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
 	stackNamePtr := flag.String("StackName", "", "Name of aws cloudformation stack (Required)")
 	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
@@ -62,7 +55,6 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	//just brute force create the map we need, todo- probably refactor to a file we read in?
 
 	// Set stack name, template url
 	// Initialize a session that the SDK uses to load
