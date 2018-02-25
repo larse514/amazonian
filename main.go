@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -100,9 +101,9 @@ func main() {
 		fmt.Printf("error creating service")
 		os.Exit(1)
 	}
-	fmt.Printf("textPt r: %s", executor)
-	// cloudformation.List Stacks()
-	fmt.Printf("finished listing?")
+	serviceName := strings.ToLower(*serviceNamePtr)
+	dnsName := "https://" + serviceName + "." + *hostedZonePtr
+	fmt.Printf("Successfully created Container Service: %s, with url: %s \n", *serviceNamePtr, dnsName)
 }
 
 //CreateServiceParameters will create the Parameter list to generate a cluster service
