@@ -1,5 +1,5 @@
 # amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian)
-Opensource tool to faciliate AWS application resource development
+Opensource tool to faciliate AWS application resource development.  Amazonian will either let you provide your own cluster, or create a new one for you.  
 
 ## installation
 Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
@@ -14,7 +14,10 @@ amazonian requires Golang and the aws go SDK installed
 Step 1: _Install Go_ <br />
 Follow the installation process in [Golang](https://golang.org/doc/install#install) docs <br /> 
 Step 2: _Install Go SDK_ <br />
-Follow the setup process defined in the [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)
+Follow the setup process defined in the [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br />
+Step 3: _IAM Role Setup_ <br />
+TODO- add required role permissions<br />
+
 ## build 
 Step 1: _clone from git_ <br />
 `$ git clone https://github.com/larse514/amazonian.git`  <br />
