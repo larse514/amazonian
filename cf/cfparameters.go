@@ -58,6 +58,7 @@ type EcsService struct {
 }
 
 //CreateServiceParameters will create the Parameter list to generate a cluster service
+//todo- unit tests!!!
 func CreateServiceParameters(outputs map[string]string, service EcsService, clusterStackName string) []*cloudformation.Parameter {
 	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
