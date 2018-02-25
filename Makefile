@@ -16,3 +16,6 @@ test: test-all
 test-all:
 	#@go test -v $(GOFILES)
 	@go test -v ./...
+
+test-all-min:
+	@go test ./...

@@ -36,3 +36,14 @@ func (service ECSService) CreateService() error {
 	}
 	return nil
 }
+
+// //CreateServiceParameters will create the Parameter list to generate a cluster service
+// func (service ECSService) CreateServiceParameters() {
+// outputs := getOutputsAsMapFromStack()
+// ecs.StackName = stackName
+// ecs.ClusterArn = outputs[clusterArn+"-"+stackName]
+// ecs.HostedZoneID = outputs[hostedZoneID+"-"+stackName]
+// ecs.EcsDNSName = outputs[ecsDNSName+"-"+stackName]
+// ecs.EcsLBArn = outputs[ecsLbArn+"-"+stackName]
+// ecs.AlbListener = outputs[albListener+"-"+stackName]
+// }

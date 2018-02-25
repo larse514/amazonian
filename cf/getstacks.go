@@ -9,7 +9,7 @@ import (
 
 //Resource is a generic interface for retrieving information on a infrastruture stack
 type Resource interface {
-	GetStack(stackName string) (cloudformation.Stack, error)
+	GetStack(stackName *string) (cloudformation.Stack, error)
 }
 
 //Stack is a struct representing an AWS Cloudformation Stack
