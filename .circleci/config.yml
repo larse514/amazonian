@@ -42,11 +42,11 @@ jobs:
         name: Run integration tests
         no_output_timeout: 30m
         command: |
-          chmod +x existing_cluster_integration.sh
-          ./existing_cluster_integration.sh
+          chmod +x integration/existing_cluster_integration.sh
+          ./integration/existing_cluster_integration.sh
           
-          chmod +x create_cluster_integration.sh
-          ./create_cluster_integration.sh
+          chmod +x integration/create_cluster_integration.sh
+          ./integration/create_cluster_integration.sh
     - save_cache:
         key: v1-pkg-cache
         paths:
