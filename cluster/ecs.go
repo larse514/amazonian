@@ -11,11 +11,13 @@ const ()
 type Cluster interface {
 	GetCluster(stackName string) (Cluster, error)
 	GetParameters() (map[string]string, error)
+	CreateCluster(clusterName string) error
 }
 
 //Ecs is an implementation of an ECS cluster
 type Ecs struct {
 	Resource  cf.Resource
+	Executor  cf.Executor
 	StackName string
 	stack     cloudformation.Stack
 }
@@ -46,4 +48,9 @@ func (ecs Ecs) GetOutputParameters() map[string]string {
 	}
 
 	return outputMap
+}
+
+//CreateCluster will create an ECS cluster
+func (ecs Ecs) CreateCluster(clusterName string) error {
+	return nil
 }

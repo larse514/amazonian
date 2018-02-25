@@ -24,7 +24,8 @@ const (
 	clusterARNParam      = "ecscluster"
 	aLBListenerARNParam  = "alblistener"
 	imageParam           = "image"
-	templateURL          = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
+	containerTemplateURL = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
+	ecsTemplateURL       = "https://s3.amazonaws.com/ecs.bucket.template/ecs/ecs.yml"
 	serviceNameParam     = "ServiceName"
 	containerNameParam   = "ContainerName"
 
@@ -46,6 +47,7 @@ func main() {
 	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
 	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", "", "Name ECS Cluster to use (Required)")
+	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists, defaults to false if not provided (Required)")
 
 	//parse the values
 	flag.Parse()
@@ -68,7 +70,12 @@ func main() {
 	svc := cloudformation.New(sess)
 	//create the service struct, this is the struct that defines everything we need to create a container service
 	//(note that for the time being only ECS is supported)
-	serviceStruct := ecsService{vpc: *vpcPtr, priority: *priorityPtr, image: *imagePtr, serviceName: *serviceNamePtr, containerName: *containerNamePtr, hostedZoneName: *hostedZonePtr}
+	serviceStruct := cf.EcsService{Vpc: *vpcPtr, Priority: *priorityPtr, Image: *imagePtr, ServiceName: *serviceNamePtr, ContainerName: *containerNamePtr, HostedZoneName: *hostedZonePtr}
+
+	//check if the cluster exists, if not create it
+	if !*clusterExistsPtr {
+		println("About to create cluster")
+	}
 	//initialize ecs to retrieve clsuter
 	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}}
 
@@ -82,18 +89,14 @@ func main() {
 	//Grab the output parameters form the ECS Cluster that was just fetched
 	ecsParameters := ecs.GetOutputParameters()
 
-	//now we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
-	//we do as such first by converting everything to a key value map
-	//key being the CF Param name, value is the value to provide to the cloudformation template
-	parameterMap := CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
-	//now convert the key value map to a list of cloudformation.Parameter 's
-	parameters := cf.CreateCloudformationParameters(parameterMap)
+	//generate the parameters to create an ECS Service
+	parameters := cf.CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
 
 	//initialize the thing that will actually create the stack
-	executor := cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: templateURL, Parameters: parameters}
+	containerExecutor := cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: containerTemplateURL, Parameters: parameters}
 	//take the executor and initialize the ECS Servie
 	//todo-this very badly needs to be renamed
-	serv := service.ECSService{Executor: executor}
+	serv := service.ECSService{Executor: containerExecutor}
 	//attempt to create the service
 	err = serv.CreateService()
 
@@ -104,32 +107,4 @@ func main() {
 	serviceName := strings.ToLower(*serviceNamePtr)
 	dnsName := "https://" + serviceName + "." + *hostedZonePtr
 	fmt.Printf("Successfully created Container Service: %s, with url: %s \n", *serviceNamePtr, dnsName)
-}
-
-//CreateServiceParameters will create the Parameter list to generate a cluster service
-func CreateServiceParameters(outputs map[string]string, service ecsService, clusterStackName string) map[string]string {
-	parameterMap := make(map[string]string, 0)
-	//todo-refactor this bloody hardcoded mess
-	parameterMap[vpcParam] = service.vpc
-	parameterMap[priorityParam] = service.priority
-	parameterMap[imageParam] = service.image
-	parameterMap[hostedZoneNameParam] = service.hostedZoneName
-	parameterMap[serviceNameParam] = service.serviceName
-	parameterMap[containerNameParam] = service.containerName
-	parameterMap[clusterARNParam] = outputs[clusterStackName]
-	parameterMap[eLBHostedZoneIDParam] = outputs[ecsHostedZoneID+"-"+clusterStackName]
-	parameterMap[eLBDNSNameParam] = outputs[ecsDNSName+"-"+clusterStackName]
-	parameterMap[eLBARNParam] = outputs[ecsLbArn+"-"+clusterStackName]
-	parameterMap[aLBListenerARNParam] = outputs[albListener+"-"+clusterStackName]
-
-	return parameterMap
-}
-
-type ecsService struct {
-	vpc            string
-	priority       string
-	hostedZoneName string
-	image          string
-	serviceName    string
-	containerName  string
 }

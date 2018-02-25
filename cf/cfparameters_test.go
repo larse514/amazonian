@@ -7,7 +7,7 @@ func TestCreateCloudformationParametersKey(t *testing.T) {
 
 	parameters["key"] = "value"
 
-	cfParams := CreateCloudformationParameters(parameters)
+	cfParams := createCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -32,7 +32,7 @@ func TestCreateCloudformationParametersValue(t *testing.T) {
 
 	parameters["key"] = "value"
 
-	cfParams := CreateCloudformationParameters(parameters)
+	cfParams := createCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -59,7 +59,7 @@ func TestCreateCloudformationParameters2ParametersBothKeysAreCorrect(t *testing.
 	parameters["key"] = "value"
 	parameters["key1"] = "value1"
 
-	cfParams := CreateCloudformationParameters(parameters)
+	cfParams := createCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -89,7 +89,7 @@ func TestCreateCloudformationParameters2ParametersBothValueAreCorrect(t *testing
 	parameters["key"] = "value"
 	parameters["key1"] = "value1"
 
-	cfParams := CreateCloudformationParameters(parameters)
+	cfParams := createCloudformationParameters(parameters)
 
 	param := cfParams
 
