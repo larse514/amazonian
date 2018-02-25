@@ -8,6 +8,12 @@ import (
 	"fmt"
 )
 
+//Executor is an interface to execute and create stacks
+type Executor interface {
+	CreateStack() error
+	PauseUntilFinished() error
+}
+
 //CFExecutor struct used to create cloudformation stacks
 type CFExecutor struct {
 	Client      cloudformationiface.CloudFormationAPI
@@ -17,7 +23,7 @@ type CFExecutor struct {
 }
 
 //CreateStack is a general method to create aws cloudformation stacks
-func (executor *CFExecutor) CreateStack() error {
+func (executor CFExecutor) CreateStack() error {
 	//generate cloudformation CreateStackInput to be used to create stack
 	input := &cloudformation.CreateStackInput{TemplateURL: aws.String(executor.TemplateURL), StackName: aws.String(executor.StackName), Parameters: executor.Parameters}
 
@@ -32,7 +38,7 @@ func (executor *CFExecutor) CreateStack() error {
 }
 
 //PauseUntilFinished is a method to wait on the status of a cloudformation stack until it finishes
-func (executor *CFExecutor) PauseUntilFinished() error {
+func (executor CFExecutor) PauseUntilFinished() error {
 	fmt.Println("Waiting for stack to be created")
 
 	// Wait until stack is created

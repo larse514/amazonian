@@ -6,7 +6,11 @@ import (
 	"os"
 
 	// "github.com/larse514/amazonian/cloudformation"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/larse514/amazonian/cf"
 	"github.com/larse514/amazonian/commandlineargs"
+	"github.com/larse514/amazonian/service"
 )
 
 const (
@@ -19,6 +23,8 @@ const (
 	clusterARNParam      = "ClusterARN"
 	aLBListenerARNParam  = "ALBListenerARN"
 	imageParam           = "Image"
+	stackName            = "default-stack"
+	templateURL          = "default-url"
 )
 
 func main() {
@@ -55,7 +61,28 @@ func main() {
 	parameterMap[aLBListenerARNParam] = *albListernArnPtr
 	parameterMap[imageParam] = *image
 
-	fmt.Printf("textPtr: %s", *vpcPtr)
-	// cloudformation.ListStacks()
+	// Set stack name, template url
+	// Initialize a session that the SDK uses to load
+	// credentials from the shared credentials file ~/.aws/credentials
+	// and configuration from the shared configuration file ~/.aws/config.
+	//todo-maybe meove this out even further
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	// Create CloudFormation client in region
+	svc := cloudformation.New(sess)
+
+	parameters := cf.CreateCloudformationParameters(parameterMap)
+
+	executor := cf.CFExecutor{Client: svc, StackName: stackName, TemplateURL: templateURL, Parameters: parameters}
+	serv := service.ECSService{Executor: executor}
+	err = serv.CreateService()
+
+	if err != nil {
+		fmt.Printf("error creating service")
+		os.Exit(1)
+	}
+	fmt.Printf("textPt r: %s", executor)
+	// cloudformation.List Stacks()
 	fmt.Printf("finished listing?")
 }
