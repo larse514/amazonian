@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/larse514/amazonian/cloudformation"
+	// "github.com/larse514/amazonian/cloudformation"
 	"github.com/larse514/amazonian/commandlineargs"
 )
 
@@ -33,6 +33,6 @@ func main() {
 	}
 
 	fmt.Printf("textPtr: %s", *vpcPtr)
-	cloudformation.ListStacks()
+	// cloudformation.ListStacks()
 	fmt.Printf("finished listing?")
 }
