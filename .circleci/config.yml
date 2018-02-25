@@ -40,6 +40,7 @@ jobs:
 
     - run:
         name: Run integration tests
+        no_output_timeout: 30m
         command: |
           chmod +x existing_cluster_integration.sh
           ./existing_cluster_integration.sh
