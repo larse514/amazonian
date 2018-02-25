@@ -25,13 +25,13 @@ func (service ECSService) CreateService() error {
 	//create the stack
 	err := service.Executor.CreateStack()
 	if err != nil {
-		println("Error processing create stack request ", err.Error)
+		println("Error processing create stack request ", err.Error())
 		return err
 	}
 	//then wait
 	err = service.Executor.PauseUntilFinished()
 	if err != nil {
-		println("Error while attempting to wait for stack to finish processing ", err.Error)
+		println("Error while attempting to wait for stack to finish processing ", err.Error())
 		return err
 	}
 	return nil

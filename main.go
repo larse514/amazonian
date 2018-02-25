@@ -14,17 +14,18 @@ import (
 )
 
 const (
-	vpcParam             = "VPC"
+	vpcParam             = "VpcId"
 	priorityParam        = "Priority"
 	hostedZoneNameParam  = "HostedZoneName"
-	eLBHostedZoneIDParam = "ELBHostedZoneId"
-	eLBDNSNameParam      = "ELBDNSName"
-	eLBARNParam          = "ELBARN"
-	clusterARNParam      = "ClusterARN"
-	aLBListenerARNParam  = "ALBListenerARN"
-	imageParam           = "Image"
-	stackName            = "default-stack"
-	templateURL          = "default-url"
+	eLBHostedZoneIDParam = "ecslbhostedzoneid"
+	eLBDNSNameParam      = "ecslbdnsname"
+	eLBARNParam          = "ecslbarn"
+	clusterARNParam      = "ecscluster"
+	aLBListenerARNParam  = "alblistener"
+	imageParam           = "image"
+	templateURL          = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
+	serviceNameParam     = "ServiceName"
+	containerNameParam   = "ContainerName"
 )
 
 func main() {
@@ -38,11 +39,15 @@ func main() {
 	elbARNPtr := flag.String("ELBARN", "", "ELBARN used to reference load balancer. (Required)")
 	clusterArnPtr := flag.String("ClusterARN", "", "ARN of Cluster to be used to run containers. (Required)")
 	albListernArnPtr := flag.String("ALBListenerARN", "", "ALB Listener Arn. (Required)")
-	image := flag.String("Image", "", "Docker Repository Image (Required)")
+	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
+	stackNamePtr := flag.String("StackName", "", "Name of aws cloudformation stack (Required)")
+	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
+	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
+
 	//parse the values
 	flag.Parse()
 	//validate arguments
-	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *hostedZonePtr, *elbHostedZoneIDPtr, *elbDNSNamePtr, *elbARNPtr, *clusterArnPtr, *albListernArnPtr, *image)
+	err := commandlineargs.ValidateArguments(*vpcPtr, *priorityPtr, *hostedZonePtr, *elbHostedZoneIDPtr, *elbDNSNamePtr, *elbARNPtr, *clusterArnPtr, *albListernArnPtr, *imagePtr)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
@@ -59,7 +64,9 @@ func main() {
 	parameterMap[eLBARNParam] = *elbARNPtr
 	parameterMap[clusterARNParam] = *clusterArnPtr
 	parameterMap[aLBListenerARNParam] = *albListernArnPtr
-	parameterMap[imageParam] = *image
+	parameterMap[imageParam] = *imagePtr
+	parameterMap[serviceNameParam] = *serviceNamePtr
+	parameterMap[containerNameParam] = *containerNamePtr
 
 	// Set stack name, template url
 	// Initialize a session that the SDK uses to load
@@ -74,7 +81,7 @@ func main() {
 
 	parameters := cf.CreateCloudformationParameters(parameterMap)
 
-	executor := cf.CFExecutor{Client: svc, StackName: stackName, TemplateURL: templateURL, Parameters: parameters}
+	executor := cf.CFExecutor{Client: svc, StackName: *stackNamePtr, TemplateURL: templateURL, Parameters: parameters}
 	serv := service.ECSService{Executor: executor}
 	err = serv.CreateService()
 
