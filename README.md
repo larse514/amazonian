@@ -38,4 +38,6 @@ Step 2: _build amazonian_ <br />
 | ClusterSize    | Number of host machines for cluster.                                   | No       | 1         |                                                         |
 | MaxSize        | Max number of host machines cluster can scale to                       | No       | 1         |                                                         |
 | InstanceType   | Type of EC2 machine                                                    | No       | t2.medium | Required if ClusterExists is false                      |
+
+
 `./workdir/amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
