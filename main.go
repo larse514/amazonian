@@ -72,7 +72,7 @@ func main() {
 		clusterParams := cf.CreateClusterParameters(clusterStruct)
 		//initialize executor to create the cluster
 		ecsTemplate, err := assets.GetAsset(ecsTemplatePath)
-		if err == nil {
+		if err != nil {
 			os.Exit(1)
 		}
 		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *clusterNamePtr, TemplateBody: ecsTemplate, Parameters: clusterParams}}
@@ -100,7 +100,7 @@ func main() {
 	parameters := cf.CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
 
 	containerTemplate, err := assets.GetAsset(containerTemplatePath)
-	if err == nil {
+	if err != nil {
 		os.Exit(1)
 	}
 	//initialize the thing that will actually create the stack
