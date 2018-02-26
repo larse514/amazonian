@@ -5,7 +5,9 @@ Opensource tool to faciliate AWS application resource development.  Amazonian wi
 Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
 <br />
 <br />
-In the meantime a full install and build is required to run
+In the meantime there are two options to use amazonian.  <br />
+1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
+2) A full install and build<br />
 
 
 ## environment setup

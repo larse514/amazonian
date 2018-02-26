@@ -11,6 +11,27 @@ Resources:
     Properties:
       BucketName:
         Ref: S3BucketName
+  ReadOnlyBucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: 
+        Ref: "AmazonianPackageBucket"
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource: 
+              Fn::Join: 
+                - ""
+                - 
+                  - "arn:aws:s3:::"
+                  - 
+                    Ref: "AmazonianPackageBucket"
+                  - "/*"
+            Principal: "*"
+
 Outputs:
   DeploymentBucket:
     Description: Bucket to version amazonian binaries
