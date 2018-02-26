@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/larse514/amazonian/assets"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/cf"
@@ -15,26 +17,10 @@ import (
 )
 
 const (
-	vpcParam             = "VpcId"
-	priorityParam        = "Priority"
-	hostedZoneNameParam  = "HostedZoneName"
-	eLBHostedZoneIDParam = "ecslbhostedzoneid"
-	eLBDNSNameParam      = "ecslbdnsname"
-	eLBARNParam          = "ecslbarn"
-	clusterARNParam      = "ecscluster"
-	aLBListenerARNParam  = "alblistener"
-	imageParam           = "image"
-	containerTemplateURL = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
-	ecsTemplateURL       = "https://s3.amazonaws.com/ecs.bucket.template/ecs/ecs.yml"
-	serviceNameParam     = "ServiceName"
-	containerNameParam   = "ContainerName"
-
-	//export param names
-	clusterArn      = "ecscluster"
-	ecsHostedZoneID = "ecslbhostedzoneid"
-	albListener     = "alblistener"
-	ecsDNSName      = "ecslbdnsname"
-	ecsLbArn        = "ecslbarn"
+	containerTemplateURL  = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
+	ecsTemplateURL        = "https://s3.amazonaws.com/ecs.bucket.template/ecs/ecs.yml"
+	containerTemplatePath = "ias/cloudformation/containertemplate.yml"
+	ecsTemplatePath       = "ias/cloudformation/ecs.yml"
 )
 
 func main() {
@@ -85,9 +71,13 @@ func main() {
 		//create the parameters
 		clusterParams := cf.CreateClusterParameters(clusterStruct)
 		//initialize executor to create the cluster
-		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *clusterNamePtr, TemplateURL: ecsTemplateURL, Parameters: clusterParams}}
+		ecsTemplate, err := assets.GetAsset(ecsTemplatePath)
+		if err == nil {
+			os.Exit(1)
+		}
+		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *clusterNamePtr, TemplateBody: ecsTemplate, Parameters: clusterParams}}
 		//create cluster
-		err := ecs.CreateCluster(*clusterNamePtr)
+		err = ecs.CreateCluster(*clusterNamePtr)
 		if err != nil {
 			println("error creating cluster ", err.Error())
 			os.Exit(1)
@@ -109,8 +99,12 @@ func main() {
 	//generate the parameters to create an ECS Service
 	parameters := cf.CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
 
+	containerTemplate, err := assets.GetAsset(containerTemplatePath)
+	if err == nil {
+		os.Exit(1)
+	}
 	//initialize the thing that will actually create the stack
-	containerExecutor := cf.CFExecutor{Client: svc, StackName: *serviceNamePtr, TemplateURL: containerTemplateURL, Parameters: parameters}
+	containerExecutor := cf.CFExecutor{Client: svc, StackName: *serviceNamePtr, TemplateBody: containerTemplate, Parameters: parameters}
 	//take the executor and initialize the ECS Servie
 	//todo-this very badly needs to be renamed
 	serv := service.ECSService{Executor: containerExecutor}

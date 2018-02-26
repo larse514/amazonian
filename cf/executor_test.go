@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	stackName   = "STACKNAME"
-	templateURL = "URL"
+	stackName    = "STACKNAME"
+	templateBody = "URL"
 )
 
 //CreateStack tests, mocks, and methods
@@ -33,7 +33,7 @@ func (m *mockBadCloudFormationClient) CreateStack(*cloudformation.CreateStackInp
 	return nil, errors.New("Bad Error")
 }
 func TestCloudformationCreateStack(t *testing.T) {
-	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
 
 	err := executor.CreateStack()
 	if err != nil {
@@ -44,7 +44,7 @@ func TestCloudformationCreateStack(t *testing.T) {
 }
 
 func TestCloudformationCreateStackFails(t *testing.T) {
-	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
 
 	err := executor.CreateStack()
 	if err == nil {
@@ -65,7 +65,7 @@ func (m *mockBadCloudFormationClient) WaitUntilStackCreateComplete(*cloudformati
 }
 
 func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
-	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
 
 	err := executor.PauseUntilFinished()
 	if err != nil {
@@ -75,7 +75,7 @@ func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 
 }
 func TestCloudformationWaitUntilStackCreateCompleteFails(t *testing.T) {
-	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateURL: templateURL, Parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
 
 	err := executor.PauseUntilFinished()
 	if err == nil {

@@ -16,10 +16,10 @@ type Executor interface {
 
 //CFExecutor struct used to create cloudformation stacks
 type CFExecutor struct {
-	Client      cloudformationiface.CloudFormationAPI
-	StackName   string
-	TemplateURL string
-	Parameters  []*cloudformation.Parameter
+	Client       cloudformationiface.CloudFormationAPI
+	StackName    string
+	TemplateBody string
+	Parameters   []*cloudformation.Parameter
 }
 
 //CreateStack is a general method to create aws cloudformation stacks
@@ -27,7 +27,7 @@ func (executor CFExecutor) CreateStack() error {
 	//generate cloudformation CreateStackInput to be used to create stack
 	input := &cloudformation.CreateStackInput{}
 
-	input.SetTemplateURL(*aws.String(executor.TemplateURL))
+	input.SetTemplateBody(*aws.String(executor.TemplateBody))
 	input.SetStackName(*aws.String(executor.StackName))
 	input.SetParameters(executor.Parameters)
 	input.SetCapabilities(createCapability())
