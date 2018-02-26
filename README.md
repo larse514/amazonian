@@ -9,25 +9,13 @@ In the meantime there are two options to use amazonian.  <br />
 1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
 2) A full install and build<br />
 
-
-## environment setup
-amazonian requires Golang and the aws go SDK installed
-
-Step 1: _Install Go_ <br />
-Follow the installation process in [Golang](https://golang.org/doc/install#install) docs <br /> 
-Step 2: _Install Go SDK_ <br />
-Follow the setup process defined in the [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br />
-Step 3: _IAM Role Setup_ <br />
-TODO- add required role permissions<br />
-
-## build 
-Step 1: _clone from git_ <br />
-`$ git clone https://github.com/larse514/amazonian.git`  <br />
-Step 2: _build amazonian_ <br />
-`$ make` <br />
-
 # running amazonian
+
+once the amazonian binary is ready to run, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target it to facilitate CI/CD pipelines
+
 ### parameters
+The following describes the parameters amazonian uses.
+
 | Paramater      | Description                                                            | Required | Default   | Note                                                    |
 |----------------|------------------------------------------------------------------------|----------|-----------|---------------------------------------------------------|
 | VPC            | Target VPC to deploy your containers                                   | Yes      | None      |                                                         |
@@ -44,5 +32,29 @@ Step 2: _build amazonian_ <br />
 | MaxSize        | Max number of host machines cluster can scale to                       | No       | 1         |                                                         |
 | InstanceType   | Type of EC2 machine                                                    | No       | t2.medium | Required if ClusterExists is false                      |
 
+An example command of how you might run amazonian can be seen below:
 
-`./workdir/amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
+`./amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
+
+# contributing
+If you would like to contribute to amazonian feel free to create a pull request or to fork the project itself. While amazonian is still under active development, and has not been released in any form, also feel free to raise issues as that will aide the development process itself.
+
+## environment setup
+amazonian requires Golang and the aws go SDK installed
+
+Step 1: _Install Go_ <br />
+Follow the installation process in [Golang](https://golang.org/doc/install#install) docs <br /> 
+Step 2: _Install Go SDK_ <br />
+Follow the setup process defined in the [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br />
+Step 3: _IAM Role Setup_ <br />
+TODO- add required role permissions<br />
+
+## build 
+Step 1: _clone from git_ <br />
+`$ git clone https://github.com/larse514/amazonian.git`  <br />
+Step 2: _build amazonian_ <br />
+`$ make` <br />
+Step 3: test amazonian_ <br />
+`$ make test` <br />
+or if you don't want to see the verbose logs 
+`$ make test-min` <br />

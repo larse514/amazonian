@@ -47,9 +47,9 @@ jobs:
     - run:
         name: Release Binary
         command: |
+          chmod +x packagemanagement/createbucket.sh
           ./packagemanagement/createbucket.sh amazonian.package.release amazonianpackage
-          aws s3 cp workdir/amazonian s3://amazonian.package.release/0.0.${CIRCLE_BUILD_NUM}/amazonian
-          aws s3 cp workdir/amazonian s3://amazonian.package.release/latest/amazonian
+          make VERSION="0.0.${CIRCLE_BUILD_NUM}" release 
     - save_cache:
         key: v1-pkg-cache
         paths:
