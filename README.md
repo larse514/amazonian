@@ -2,7 +2,7 @@
 Opensource tool to faciliate AWS application resource development.  Amazonian will either let you provide your own cluster, or create a new one for you.  
 
 ## installation
-Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
+Eventually the plan is to add this as a commandline tool and distribute is to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
 <br />
 <br />
 In the meantime there are two options to use amazonian.  <br />
@@ -26,7 +26,7 @@ The following describes the parameters amazonian uses.
 | ContainerName  | Name of container to be deployed                                       | Yes      | None      |                                                         |
 | ClusterName    | Name ECS Cluster to use                                                | Yes      | None      | This will be expanded to include Fargate and Kubernetes |
 | ClusterExists  | Specify whether to use an existing cluster                             | No       | false     |                                                         |
-| Subnets        | List of VPC Subnets to deploy cluster to.                              | No       |           | Required if ClusterExists is false                      |
+| Subnets        | List of VPC Subnets to deploy cluster to.                              | Sometimes       |           | Required if ClusterExists is false                      |
 | KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       |           |                                                         |
 | ClusterSize    | Number of host machines for cluster.                                   | No       | 1         |                                                         |
 | MaxSize        | Max number of host machines cluster can scale to                       | No       | 1         |                                                         |
@@ -36,10 +36,160 @@ An example command of how you might run amazonian can be seen below:
 
 `./amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
 
-# contributing
-If you would like to contribute to amazonian feel free to create a pull request or to fork the project itself. While amazonian is still under active development, and has not been released in any form, also feel free to raise issues as that will aide the development process itself.
-
 ## environment setup
+amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
+[AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
+
+amazonian itself requires the following minimum permissions to execute:
+TODO- the below is not fully correct!!! it is currently a place holder.  You have been warned!
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "application-autoscaling:DeleteScalingPolicy",
+                "application-autoscaling:DeregisterScalableTarget",
+                "application-autoscaling:DescribeScalableTargets",
+                "application-autoscaling:DescribeScalingActivities",
+                "application-autoscaling:DescribeScalingPolicies",
+                "application-autoscaling:PutScalingPolicy",
+                "application-autoscaling:RegisterScalableTarget",
+                "autoscaling:UpdateAutoScalingGroup",
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:DeleteLaunchConfiguration",
+                "autoscaling:Describe*",
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
+                "cloudformation:DescribeStack*",
+                "cloudformation:UpdateStack",
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:PutMetricAlarm",
+                "ec2:AssociateRouteTable",
+                "ec2:AttachInternetGateway",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:CancelSpotFleetRequests",
+                "ec2:CreateInternetGateway",
+                "ec2:CreateRoute",
+                "ec2:CreateRouteTable",
+                "ec2:CreateSecurityGroup",
+                "ec2:CreateSubnet",
+                "ec2:CreateVpc",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteVpc",
+                "ec2:Describe*",
+                "ec2:DetachInternetGateway",
+                "ec2:DisassociateRouteTable",
+                "ec2:ModifySubnetAttribute",
+                "ec2:ModifyVpcAttribute",
+                "ec2:RequestSpotFleet",
+                "elasticloadbalancing:CreateListener",
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:CreateRule",
+                "elasticloadbalancing:CreateTargetGroup",
+                "elasticloadbalancing:DeleteListener",
+                "elasticloadbalancing:DeleteLoadBalancer",
+                "elasticloadbalancing:DeleteRule",
+                "elasticloadbalancing:DeleteTargetGroup",
+                "elasticloadbalancing:DescribeListeners",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeRules",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "ecs:*",
+                "events:DescribeRule",
+                "events:DeleteRule",
+                "events:ListRuleNamesByTarget",
+                "events:ListTargetsByRule",
+                "events:PutRule",
+                "events:PutTargets",
+                "events:RemoveTargets",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListInstanceProfiles",
+                "iam:ListRoles",
+                "logs:CreateLogGroup",
+                "logs:DescribeLogGroups",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DeleteInternetGateway",
+                "ec2:DeleteRoute",
+                "ec2:DeleteRouteTable",
+                "ec2:DeleteSecurityGroup"
+            ],
+            "Resource": [
+                "*"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/aws:cloudformation:stack-name": "EC2ContainerService-*"
+                }
+            }
+        },
+        {
+            "Action": "iam:PassRole",
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "iam:PassedToService": "ecs-tasks.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Action": "iam:PassRole",
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:iam::*:role/ecsInstanceRole*"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "iam:PassedToService": ["ec2.amazonaws.com", "ec2.amazonaws.com.cn"]
+                }
+            }
+        },
+        {
+            "Action": "iam:PassRole",
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:iam::*:role/ecsAutoscaleRole*"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "iam:PassedToService": ["application-autoscaling.amazonaws.com", "application-autoscaling.amazonaws.com.cn"]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "*",
+            "Condition": {
+                "StringLike": {
+                    "iam:AWSServiceName": ["ecs.amazonaws.com", "spot.amazonaws.com", "spotfleet.amazonaws.com"]
+                }
+            }
+        }
+    ]
+}
+```
+
+# contributing
+If you would like to contribute to amazonian feel free to create a pull request or to fork the project itself. While amazonian is still under active development, and has not been released in any form, also feel free to raise issues as that will aide the development process.
+
+## development environment setup
 amazonian requires Golang and the aws go SDK installed
 
 Step 1: _Install Go_ <br />
