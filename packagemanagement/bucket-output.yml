@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template with S3 bucket to host and publish amazonian
+Outputs:
+  DeploymentBucket:
+    Description: Bucket to version amazonian binaries
+    Value:
+      Ref: AmazonianPackageBucket
+Parameters:
+  S3BucketName:
+    Type: String
+Resources:
+  AmazonianPackageBucket:
+    Properties:
+      BucketName:
+        Ref: S3BucketName
+    Type: AWS::S3::Bucket
+  ReadOnlyBucketPolicy:
+    Properties:
+      Bucket:
+        Ref: AmazonianPackageBucket
+      PolicyDocument:
+        Statement:
+        - Action:
+          - s3:GetObject
+          Effect: Allow
+          Principal: '*'
+          Resource:
+            Fn::Join:
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: AmazonianPackageBucket
+              - /*
+    Type: AWS::S3::BucketPolicy

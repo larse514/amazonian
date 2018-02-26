@@ -35,4 +35,4 @@ Resources:
 Outputs:
   DeploymentBucket:
     Description: Bucket to version amazonian binaries
-    Value: !Ref DeploymentBucket
+    Value: !Ref AmazonianPackageBucket

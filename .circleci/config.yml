@@ -47,8 +47,9 @@ jobs:
     - run:
         name: Release Binary
         command: |
-          chmod +x packagemanagement/createbucket.sh
-          ./packagemanagement/createbucket.sh amazonian.package.release amazonianpackage
+          ##Note- the below is removed and has been run locally due to bug in cloudformation api not supporting no error if no changes
+          # chmod +x packagemanagement/createbucket.sh
+          # ./packagemanagement/createbucket.sh amazonian.package.release amazonianpackage
           make VERSION="0.0.${CIRCLE_BUILD_NUM}" release 
     - save_cache:
         key: v1-pkg-cache
