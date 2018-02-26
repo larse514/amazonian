@@ -56,6 +56,7 @@ func (executor CFExecutor) PauseUntilFinished() error {
 	return err
 }
 
+//helper method which statically generates CAPABILITY_IAM (a requirement for CloudFormation)
 func createCapability() []*string {
 	capabilities := make([]*string, 0)
 	capIAM := "CAPABILITY_IAM"

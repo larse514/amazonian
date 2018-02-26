@@ -11,6 +11,9 @@ build: workdir/amazonian
 workdir/amazonian: $(GOFILES)
 	go build -o workdir/amazonian .
 
+dependencies: 
+	@go get github.com/aws/aws-sdk-go/service/cloudformation
+	@go get github.com/jteeuwen/go-bindata
 test: test-all
 
 test-all:
