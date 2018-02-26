@@ -16,7 +16,7 @@ dependencies:
 	# @go get github.com/kevinburke/go-bindata
 	aws s3 cp s3://ecs.bucket.template/ecs/ecs.yml ias/cloudformation 
 	aws s3 cp s3://ecs.bucket.template/ecstenant/containertemplate.yml ias/cloudformation 
-	./go-bindata -o assets/myfile.go ias/...
+	# ./go-bindata -o assets/myfile.go ias/...
 	
 test: test-all
 
