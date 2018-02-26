@@ -13,7 +13,7 @@ workdir/amazonian: $(GOFILES)
 
 dependencies: 
 	@go get github.com/aws/aws-sdk-go/service/cloudformation
-	@go get github.com/jteeuwen/go-bindata
+	@go get github.com/kevinburke/go-bindata
 test: test-all
 
 test-all:
