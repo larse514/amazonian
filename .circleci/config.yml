@@ -44,6 +44,11 @@ jobs:
         command: |
           chmod +x integration/create_cluster_integration.sh
           ./integration/create_cluster_integration.sh
+    - run:
+        name: Release Binary
+        command: |
+          ./packagemanagement/createbucket.sh amazonian.package.release amazonianpackage
+          aws s3 cp workdir/amazonian s3://amazonian.package.release/0.0.${CIRCLE_BUILD_NUM}/amazonian
     - save_cache:
         key: v1-pkg-cache
         paths:

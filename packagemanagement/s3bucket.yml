@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template with S3 bucket to host and publish amazonian'
+Parameters:
+  S3BucketName:
+    Type: String
+    
+Resources:
+  #todo- create backup bucket and policy
+  AmazonianPackageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: S3BucketName
+Outputs:
+  DeploymentBucket:
+    Description: Bucket to version amazonian binaries
+    Value: !Ref DeploymentBucket
