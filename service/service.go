@@ -1,8 +1,6 @@
 package service
 
 import (
-	"os"
-
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/assets"
 	"github.com/larse514/amazonian/cf"
@@ -43,6 +41,7 @@ type Service interface {
 //EcsService is used to create a ECS Container Service
 type EcsService struct {
 	Executor       cf.Executor
+	LoadBalancer   cf.LoadBalancer
 	Vpc            string
 	Priority       string
 	HostedZoneName string
@@ -59,17 +58,22 @@ type EcsService struct {
 
 //CreateService is a method that creates a service for an ecs service
 func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService, stackName string) error {
-	containerTemplate, err := assets.GetAsset(containerTemplatePath)
-	if err != nil {
-		os.Exit(1)
-	}
+
 	//get the parameters
 	parameters := createServiceParameters(ecs, ecsService, stackName)
-	//brad the template
-	containerTemplate, err = assets.GetAsset(containerTemplatePath)
+	//grab the template
+	containerTemplate, err := assets.GetAsset(containerTemplatePath)
 	if err != nil {
-		os.Exit(1)
+		println("error retrieving container service template ", err.Error())
+		return err
 	}
+	//Now grab the priority
+	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
+	if err != nil {
+		println("error retrieving latest priority ", err.Error())
+		return err
+	}
+	ecsService.Priority = priority
 	//create the stack
 	err = service.Executor.CreateStack(containerTemplate, stackName, parameters)
 	if err != nil {

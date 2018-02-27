@@ -9,7 +9,6 @@ import (
 //CommandLineArgs is a struct representing items pulled from the command line
 type CommandLineArgs struct {
 	VPC            string
-	Priority       string
 	HostedZoneName string
 	Image          string
 	ServiceName    string
@@ -42,7 +41,6 @@ func validateArguments(args ...string) error {
 func GenerateArgs() (CommandLineArgs, error) {
 	//todo-refactor flags more for unit testing
 	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
-	priorityPtr := flag.String("Priority", "", "Priority use in Target Group Rules. (Required)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
 	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
@@ -57,7 +55,7 @@ func GenerateArgs() (CommandLineArgs, error) {
 	//parse the values
 	flag.Parse()
 	//validate arguments
-	err := validateArguments(*vpcPtr, *priorityPtr, *imagePtr, *imagePtr, *serviceNamePtr, *containerNamePtr, *clusterNamePtr)
+	err := validateArguments(*vpcPtr, *imagePtr, *imagePtr, *serviceNamePtr, *containerNamePtr, *clusterNamePtr)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
@@ -66,7 +64,6 @@ func GenerateArgs() (CommandLineArgs, error) {
 
 	args := CommandLineArgs{}
 	args.VPC = *vpcPtr
-	args.Priority = *priorityPtr
 	args.HostedZoneName = *hostedZonePtr
 	args.Image = *imagePtr
 	args.ServiceName = *serviceNamePtr
