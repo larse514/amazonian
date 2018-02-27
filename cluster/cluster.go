@@ -123,14 +123,12 @@ func (ecs Ecs) CreateCluster(clusterName string, cluster EcsCluster) error {
 	ecs.StackName = clusterName
 	//create the stack
 	err = ecs.Executor.CreateStack(ecsTemplate, clusterName, clusterParams)
-	println("jere")
 	if err != nil {
 		println("Error processing create stack request ", err.Error())
 		return err
 	}
 	//then wait
 	err = ecs.Executor.PauseUntilFinished(clusterName)
-	println("jere")
 
 	if err != nil {
 		println("Error while attempting to wait for stack to finish processing ", err.Error())

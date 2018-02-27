@@ -58,6 +58,13 @@ type EcsService struct {
 
 //CreateService is a method that creates a service for an ecs service
 func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService, stackName string) error {
+	//Now grab the priority
+	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
+	if err != nil {
+		println("error retrieving latest priority ", err.Error())
+		return err
+	}
+	ecsService.Priority = priority
 
 	//get the parameters
 	parameters := createServiceParameters(ecs, ecsService, stackName)
@@ -67,13 +74,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 		println("error retrieving container service template ", err.Error())
 		return err
 	}
-	//Now grab the priority
-	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
-	if err != nil {
-		println("error retrieving latest priority ", err.Error())
-		return err
-	}
-	ecsService.Priority = priority
+
 	//create the stack
 	err = service.Executor.CreateStack(containerTemplate, stackName, parameters)
 	if err != nil {
