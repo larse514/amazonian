@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/larse514/amazonian/cf"
 	"github.com/larse514/amazonian/cluster"
 	"github.com/larse514/amazonian/commandlineargs"
@@ -27,12 +28,13 @@ func main() {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
-	// Create CloudFormation client in region
+	// Create CloudFormation and LoadBalancer client in region
 	svc := cloudformation.New(sess)
+	elb := elbv2.New(sess)
 
 	//Initialize the dependencies
 	containerExecutor := cf.CFExecutor{Client: svc}
-	serv := service.EcsService{Executor: containerExecutor}
+	serv := service.EcsService{Executor: containerExecutor, LoadBalancer: cf.AWSElb{Client: elb}}
 	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: containerExecutor}
 
 	//check if the cluster exists, if not create it
