@@ -52,7 +52,7 @@ func TestGetHighestPriorty(t *testing.T) {
 
 	priority, _ := lb.GetHighestPriority(&listenerARN)
 
-	if priority != "7" {
+	if priority != 7 {
 		t.Log("priority ", priority, " invalid")
 		t.Fail()
 	}
@@ -76,7 +76,7 @@ func TestGetHighestPriortyLowerCase(t *testing.T) {
 
 	priority := getHighestPriorty(createDescribeRules())
 
-	if priority != "7" {
+	if priority != 7 {
 		t.Log("priority ", priority, " invalid")
 		t.Fail()
 	}

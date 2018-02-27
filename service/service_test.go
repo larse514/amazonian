@@ -27,11 +27,11 @@ type mockBadLoadBalancer struct {
 	Client elbv2iface.ELBV2API
 }
 
-func (lb mockGoodLoadBalancer) GetHighestPriority(listenerArn *string) (string, error) {
-	return "10", nil
+func (lb mockGoodLoadBalancer) GetHighestPriority(listenerArn *string) (int, error) {
+	return 10, nil
 }
-func (lb mockBadLoadBalancer) GetHighestPriority(listenerArn *string) (string, error) {
-	return "10", errors.New("ERROR")
+func (lb mockBadLoadBalancer) GetHighestPriority(listenerArn *string) (int, error) {
+	return 10, errors.New("ERROR")
 }
 func (m mockGoodExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return nil

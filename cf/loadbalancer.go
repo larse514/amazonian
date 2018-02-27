@@ -10,7 +10,7 @@ import (
 
 //LoadBalancer is an interface to define services
 type LoadBalancer interface {
-	GetHighestPriority(listenerArn *string) (string, error)
+	GetHighestPriority(listenerArn *string) (int, error)
 }
 
 //AWSElb is a struct to interact with ELBV2 API
@@ -19,20 +19,20 @@ type AWSElb struct {
 }
 
 //GetHighestPriority is a method to retrieve highest priority for ELBV2 Listener Rules
-func (lb AWSElb) GetHighestPriority(listenerArn *string) (string, error) {
+func (lb AWSElb) GetHighestPriority(listenerArn *string) (int, error) {
 	input := &elbv2.DescribeRulesInput{ListenerArn: listenerArn}
 
 	output, err := lb.Client.DescribeRules(input)
 	if err != nil {
 		println("Error retrieving Rules Input ", err.Error())
-		return "", errors.New("Error retrieving Rules Input")
+		return 0, errors.New("Error retrieving Rules Input")
 	}
 
 	return getHighestPriorty(output), nil
 }
 
 //helper method to grab highest priority from Rules slice
-func getHighestPriorty(output *elbv2.DescribeRulesOutput) string {
+func getHighestPriorty(output *elbv2.DescribeRulesOutput) int {
 	priority := 1
 
 	for _, rule := range output.Rules {
@@ -45,5 +45,5 @@ func getHighestPriorty(output *elbv2.DescribeRulesOutput) string {
 		}
 	}
 
-	return strconv.Itoa(priority)
+	return priority
 }

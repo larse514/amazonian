@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/assets"
 	"github.com/larse514/amazonian/cf"
@@ -64,7 +66,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 		println("error retrieving latest priority ", err.Error())
 		return err
 	}
-	ecsService.Priority = priority
+	ecsService.Priority = strconv.Itoa(priority + 1)
 
 	//get the parameters
 	parameters := createServiceParameters(ecs, ecsService, stackName)
