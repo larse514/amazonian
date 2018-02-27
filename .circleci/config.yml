@@ -1,10 +1,6 @@
 version: 2
-jobs: 
+jobs:
   build:
-    branches:
-      only:
-        - master
-        - /feature-.*/
     working_directory: /go/src/github.com/larse514/amazonian
     docker:
       - image: larse514/circleci-golang:latest
@@ -35,31 +31,12 @@ jobs:
         command: |
           trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
           make test | tee ${TEST_RESULTS}/go-test.out
-    - save_cache:
-        key: v1-pkg-cache
-        paths:
-          - "/go/pkg"
-
-    - store_artifacts:
-        path: /tmp/test-results
-        destination: raw-test-output
-
-    - store_test_results:
-        path: /tmp/test-results
-  deploy:
-    branches:
-      only:
-        - master
-    working_directory: /go/src/github.com/larse514/amazonian
-    docker:
-      - image: larse514/circleci-golang:latest
     - run: make
     - run: 
         name: Configure AWS environment
         command: |
           aws configure set default.region us-east-1
           aws configure set default.output json
-
     - run:
         name: Run integration tests
         no_output_timeout: 30m
@@ -73,3 +50,14 @@ jobs:
           # chmod +x packagemanagement/createbucket.sh
           # ./packagemanagement/createbucket.sh amazonian.package.release amazonianpackage
           make VERSION="0.0.${CIRCLE_BUILD_NUM}" release 
+    - save_cache:
+        key: v1-pkg-cache
+        paths:
+          - "/go/pkg"
+
+    - store_artifacts:
+        path: /tmp/test-results
+        destination: raw-test-output
+
+    - store_test_results:
+        path: /tmp/test-results
