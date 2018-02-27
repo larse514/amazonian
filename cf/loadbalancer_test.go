@@ -46,7 +46,7 @@ func createDescribeRules() *elbv2.DescribeRulesOutput {
 }
 
 func TestGetHighestPriorty(t *testing.T) {
-	lb := LoadBalancer{Client: mockGoodelbv2ifaceClient{}}
+	lb := AWSElb{Client: mockGoodelbv2ifaceClient{}}
 
 	listenerARN := "listenerarn"
 
@@ -59,7 +59,7 @@ func TestGetHighestPriorty(t *testing.T) {
 
 }
 func TestGetHighestPriortyError(t *testing.T) {
-	lb := LoadBalancer{Client: mockBadelbv2ifaceClient{}}
+	lb := AWSElb{Client: mockBadelbv2ifaceClient{}}
 
 	listenerARN := "listenerarn"
 

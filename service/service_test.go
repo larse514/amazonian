@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
+	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 	"github.com/larse514/amazonian/cluster"
 )
 
@@ -19,7 +20,19 @@ const (
 type mockGoodExecutor struct {
 	cloudformationiface.CloudFormationAPI
 }
+type mockGoodLoadBalancer struct {
+	Client elbv2iface.ELBV2API
+}
+type mockBadLoadBalancer struct {
+	Client elbv2iface.ELBV2API
+}
 
+func (lb mockGoodLoadBalancer) GetHighestPriority(listenerArn *string) (string, error) {
+	return "10", nil
+}
+func (lb mockBadLoadBalancer) GetHighestPriority(listenerArn *string) (string, error) {
+	return "10", errors.New("ERROR")
+}
 func (m mockGoodExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return nil
 }
@@ -51,7 +64,7 @@ func (m mockBadCreateStackExecutor) PauseUntilFinished(stackName string) error {
 	return nil
 }
 func TestCreateServicePasses(t *testing.T) {
-	serv := EcsService{Executor: mockGoodExecutor{}}
+	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
 	ecs := cluster.Ecs{}
 	service := EcsService{}
 	err := serv.CreateService(&ecs, service, stackName)
@@ -63,7 +76,19 @@ func TestCreateServicePasses(t *testing.T) {
 
 }
 func TestCreateServiceCreateStackFails(t *testing.T) {
-	serv := EcsService{Executor: mockBadCreateStackExecutor{}}
+	serv := EcsService{Executor: mockBadCreateStackExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
+	ecs := cluster.Ecs{}
+	service := EcsService{}
+	err := serv.CreateService(&ecs, service, stackName)
+
+	if err == nil {
+		t.Log("Error not returned")
+		t.Fail()
+	}
+
+}
+func TestCreateServicePriorityFails(t *testing.T) {
+	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockBadLoadBalancer{}}
 	ecs := cluster.Ecs{}
 	service := EcsService{}
 	err := serv.CreateService(&ecs, service, stackName)
@@ -76,7 +101,7 @@ func TestCreateServiceCreateStackFails(t *testing.T) {
 }
 
 func TestCreateServicePauseFails(t *testing.T) {
-	serv := EcsService{Executor: mockGoodCreateStackFailedPauseExecutor{}}
+	serv := EcsService{Executor: mockGoodCreateStackFailedPauseExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
 	ecs := cluster.Ecs{}
 	service := EcsService{}
 	err := serv.CreateService(&ecs, service, stackName)

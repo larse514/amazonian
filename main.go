@@ -68,7 +68,6 @@ func main() {
 	//(note that for the time being only ECS is supported)
 	serviceStruct := service.EcsService{}
 	serviceStruct.Vpc = args.VPC
-	serviceStruct.Priority = args.Priority
 	serviceStruct.Image = args.Image
 	serviceStruct.ServiceName = args.ServiceName
 	serviceStruct.ContainerName = args.ContainerName

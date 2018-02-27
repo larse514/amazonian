@@ -1,5 +1,5 @@
 # amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian)
-Opensource tool to faciliate AWS application resource development.  
+Opensource tool to faciliate AWS container based application development.  
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />

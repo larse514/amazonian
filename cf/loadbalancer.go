@@ -8,13 +8,18 @@ import (
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 )
 
-//LoadBalancer is a struct to interact with ELBV2 API
-type LoadBalancer struct {
+//LoadBalancer is an interface to define services
+type LoadBalancer interface {
+	GetHighestPriority(listenerArn *string) (string, error)
+}
+
+//AWSElb is a struct to interact with ELBV2 API
+type AWSElb struct {
 	Client elbv2iface.ELBV2API
 }
 
 //GetHighestPriority is a method to retrieve highest priority for ELBV2 Listener Rules
-func (lb LoadBalancer) GetHighestPriority(listenerArn *string) (string, error) {
+func (lb AWSElb) GetHighestPriority(listenerArn *string) (string, error) {
 	input := &elbv2.DescribeRulesInput{ListenerArn: listenerArn}
 
 	output, err := lb.Client.DescribeRules(input)
