@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/larse514/amazonian/assets"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/cf"
@@ -17,8 +15,6 @@ import (
 )
 
 const (
-	containerTemplateURL  = "https://s3.amazonaws.com/ecs.bucket.template/ecstenant/containertemplate.yml"
-	ecsTemplateURL        = "https://s3.amazonaws.com/ecs.bucket.template/ecs/ecs.yml"
 	containerTemplatePath = "ias/cloudformation/containertemplate.yml"
 	ecsTemplatePath       = "ias/cloudformation/ecs.yml"
 )
@@ -58,33 +54,31 @@ func main() {
 	}))
 	// Create CloudFormation client in region
 	svc := cloudformation.New(sess)
-	//create the service struct, this is the struct that defines everything we need to create a container service
-	//(note that for the time being only ECS is supported)
-	serviceStruct := cf.EcsService{Vpc: *vpcPtr, Priority: *priorityPtr, Image: *imagePtr, ServiceName: *serviceNamePtr, ContainerName: *containerNamePtr, HostedZoneName: *hostedZonePtr}
 
-	ecs := cluster.Ecs{}
+	//Initialize the dependencies
+	containerExecutor := cf.CFExecutor{Client: svc}
+	serv := service.EcsService{Executor: containerExecutor}
+	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: containerExecutor}
+
 	//check if the cluster exists, if not create it
 	if !*clusterExistsPtr {
 		//for now lets hardcode the ECSCluster params
 		//todo-refactor to not one giant line
-		clusterStruct := cf.EcsCluster{DomainName: *hostedZonePtr, KeyName: *keyNamePrt, VpcID: *vpcPtr, SubnetIDs: *subnetPrt, DesiredCapacity: *cluserSizePrt, MaxSize: *mazSizePrt, InstanceType: *instanceTypePrt}
-		//create the parameters
-		clusterParams := cf.CreateClusterParameters(clusterStruct)
-		//initialize executor to create the cluster
-		ecsTemplate, err := assets.GetAsset(ecsTemplatePath)
-		if err != nil {
-			os.Exit(1)
-		}
-		ecs = cluster.Ecs{Executor: cf.CFExecutor{Client: svc, StackName: *clusterNamePtr, TemplateBody: ecsTemplate, Parameters: clusterParams}}
+		clusterStruct := cluster.EcsCluster{}
+		clusterStruct.DomainName = *hostedZonePtr
+		clusterStruct.KeyName = *keyNamePrt
+		clusterStruct.VpcID = *vpcPtr
+		clusterStruct.SubnetIDs = *subnetPrt
+		clusterStruct.DesiredCapacity = *cluserSizePrt
+		clusterStruct.MaxSize = *mazSizePrt
+		clusterStruct.InstanceType = *instanceTypePrt
 		//create cluster
-		err = ecs.CreateCluster(*clusterNamePtr)
+		err = ecs.CreateCluster(*clusterNamePtr, clusterStruct)
 		if err != nil {
 			println("error creating cluster ", err.Error())
 			os.Exit(1)
 		}
 	}
-	//initialize ecs to retrieve cluster
-	ecs = cluster.Ecs{Resource: cf.Stack{Client: svc}}
 
 	//now get the cluster based on the stack name provided
 	ecs, err = ecs.GetCluster(*clusterNamePtr)
@@ -93,23 +87,21 @@ func main() {
 		fmt.Printf("error retrieving stack %s", *clusterNamePtr)
 		os.Exit(1)
 	}
-	//Grab the output parameters form the ECS Cluster that was just fetched
-	ecsParameters := ecs.GetOutputParameters()
 
-	//generate the parameters to create an ECS Service
-	parameters := cf.CreateServiceParameters(ecsParameters, serviceStruct, *clusterNamePtr)
+	//let's get the priority for the next service
+	// priority, err := cf.LoadBalancer.GetHighestPriority()
+	//create the service struct, this is the struct that defines everything we need to create a container service
+	//(note that for the time being only ECS is supported)
+	serviceStruct := service.EcsService{}
+	serviceStruct.Vpc = *vpcPtr
+	serviceStruct.Priority = *priorityPtr
+	serviceStruct.Image = *imagePtr
+	serviceStruct.ServiceName = *serviceNamePtr
+	serviceStruct.ContainerName = *containerNamePtr
+	serviceStruct.HostedZoneName = *hostedZonePtr
 
-	containerTemplate, err := assets.GetAsset(containerTemplatePath)
-	if err != nil {
-		os.Exit(1)
-	}
-	//initialize the thing that will actually create the stack
-	containerExecutor := cf.CFExecutor{Client: svc, StackName: *serviceNamePtr, TemplateBody: containerTemplate, Parameters: parameters}
-	//take the executor and initialize the ECS Servie
-	//todo-this very badly needs to be renamed
-	serv := service.ECSService{Executor: containerExecutor}
 	//attempt to create the service
-	err = serv.CreateService()
+	err = serv.CreateService(&ecs, serviceStruct, *serviceNamePtr)
 
 	if err != nil {
 		fmt.Printf("error creating service")

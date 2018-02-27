@@ -33,9 +33,9 @@ func (m *mockBadCloudFormationClient) CreateStack(*cloudformation.CreateStackInp
 	return nil, errors.New("Bad Error")
 }
 func TestCloudformationCreateStack(t *testing.T) {
-	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}
 
-	err := executor.CreateStack()
+	err := executor.CreateStack(templateBody, stackName, nil)
 	if err != nil {
 		t.Log("Successful stack request return error")
 		t.Fail()
@@ -44,9 +44,9 @@ func TestCloudformationCreateStack(t *testing.T) {
 }
 
 func TestCloudformationCreateStackFails(t *testing.T) {
-	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}}
 
-	err := executor.CreateStack()
+	err := executor.CreateStack(templateBody, stackName, nil)
 	if err == nil {
 		t.Log("Error should have been returned")
 		t.Fail()
@@ -65,9 +65,9 @@ func (m *mockBadCloudFormationClient) WaitUntilStackCreateComplete(*cloudformati
 }
 
 func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
-	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}
 
-	err := executor.PauseUntilFinished()
+	err := executor.PauseUntilFinished(stackName)
 	if err != nil {
 		t.Log("Successful stack request return error")
 		t.Fail()
@@ -75,9 +75,9 @@ func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 
 }
 func TestCloudformationWaitUntilStackCreateCompleteFails(t *testing.T) {
-	executor := CFExecutor{Client: &mockBadCloudFormationClient{}, StackName: stackName, TemplateBody: templateBody, Parameters: nil}
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}}
 
-	err := executor.PauseUntilFinished()
+	err := executor.PauseUntilFinished(stackName)
 	if err == nil {
 		t.Log("Error should have been returned")
 		t.Fail()

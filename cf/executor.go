@@ -10,26 +10,23 @@ import (
 
 //Executor is an interface to execute and create stacks
 type Executor interface {
-	CreateStack() error
-	PauseUntilFinished() error
+	CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
+	PauseUntilFinished(stackName string) error
 }
 
 //CFExecutor struct used to create cloudformation stacks
 type CFExecutor struct {
-	Client       cloudformationiface.CloudFormationAPI
-	StackName    string
-	TemplateBody string
-	Parameters   []*cloudformation.Parameter
+	Client cloudformationiface.CloudFormationAPI
 }
 
 //CreateStack is a general method to create aws cloudformation stacks
-func (executor CFExecutor) CreateStack() error {
+func (executor CFExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	//generate cloudformation CreateStackInput to be used to create stack
 	input := &cloudformation.CreateStackInput{}
 
-	input.SetTemplateBody(*aws.String(executor.TemplateBody))
-	input.SetStackName(*aws.String(executor.StackName))
-	input.SetParameters(executor.Parameters)
+	input.SetTemplateBody(*aws.String(templateBody))
+	input.SetStackName(*aws.String(stackName))
+	input.SetParameters(parameters)
 	input.SetCapabilities(createCapability())
 	//todo-refactor to return output
 	_, err := executor.Client.CreateStack(input)
@@ -43,11 +40,11 @@ func (executor CFExecutor) CreateStack() error {
 }
 
 //PauseUntilFinished is a method to wait on the status of a cloudformation stack until it finishes
-func (executor CFExecutor) PauseUntilFinished() error {
+func (executor CFExecutor) PauseUntilFinished(stackName string) error {
 	fmt.Println("Waiting for stack to be created")
 
 	// Wait until stack is created
-	desInput := &cloudformation.DescribeStacksInput{StackName: aws.String(executor.StackName)}
+	desInput := &cloudformation.DescribeStacksInput{StackName: aws.String(stackName)}
 	err := executor.Client.WaitUntilStackCreateComplete(desInput)
 	if err != nil {
 		fmt.Println("Got error waiting for stack to be created")

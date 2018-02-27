@@ -1,13 +1,17 @@
 # amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian)
 Opensource tool to faciliate AWS application resource development.  Amazonian will either let you provide your own cluster, or create a new one for you.  
 
+## what does amazonian do?
+![ECS](docs/ecs.png) <br />
+The goal of amazonian is to abstract away the complexity of deploying continers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values, and amazonian will deploy, run, monitor, and secure your containers for you.  Its your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
+
 ## installation
 Eventually the plan is to add this as a commandline tool and distribute is to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
 <br />
 <br />
 In the meantime there are two options to use amazonian.  <br />
 1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
-2) A full install and build<br />
+2) A full install and build <br />
 
 # running amazonian
 

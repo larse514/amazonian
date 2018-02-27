@@ -7,7 +7,7 @@ func TestCreateCloudformationParametersKey(t *testing.T) {
 
 	parameters["key"] = "value"
 
-	cfParams := createCloudformationParameters(parameters)
+	cfParams := CreateCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -32,7 +32,7 @@ func TestCreateCloudformationParametersValue(t *testing.T) {
 
 	parameters["key"] = "value"
 
-	cfParams := createCloudformationParameters(parameters)
+	cfParams := CreateCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -59,7 +59,7 @@ func TestCreateCloudformationParameters2ParametersBothKeysAreCorrect(t *testing.
 	parameters["key"] = "value"
 	parameters["key1"] = "value1"
 
-	cfParams := createCloudformationParameters(parameters)
+	cfParams := CreateCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -89,7 +89,7 @@ func TestCreateCloudformationParameters2ParametersBothValueAreCorrect(t *testing
 	parameters["key"] = "value"
 	parameters["key1"] = "value1"
 
-	cfParams := createCloudformationParameters(parameters)
+	cfParams := CreateCloudformationParameters(parameters)
 
 	param := cfParams
 
@@ -112,19 +112,5 @@ func TestCreateCloudformationParameters2ParametersBothValueAreCorrect(t *testing
 	if *paramValue2.ParameterValue != "value" && *paramValue2.ParameterValue != "value1" {
 		t.Log("paramater key ", paramValue2.GoString(), " is not correct")
 		t.Fail()
-	}
-}
-
-//CreateClusterParameters tests
-func TestCreateClusterParameters(t *testing.T) {
-	cluster := EcsCluster{DomainName: "DOMAINAME"}
-
-	params := CreateClusterParameters(cluster)
-
-	if *params[0].ParameterKey != "DomainName" {
-		t.Log("paramkey ", params[0].ParameterKey, " did not get set to correct constant value")
-	}
-	if *params[0].ParameterValue != "DOMAINAME" {
-		t.Log("paramvalue ", params[0].ParameterValue, " did not get set to correct constant value")
 	}
 }
