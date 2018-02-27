@@ -91,7 +91,7 @@ func (ecs Ecs) GetCluster(stackName string) (Ecs, error) {
 
 	outputMap := getOutputParameters(&stack)
 	//todo- I know, hard coded convention =/
-	ecs.ClusterArn = outputMap[clusterArn+"-"+stackName]
+	ecs.ClusterArn = outputMap[stackName]
 	ecs.ECSHostedZoneID = outputMap[ecsHostedZoneID+"-"+stackName]
 	ecs.ECSDNSName = outputMap[ecsDNSName+"-"+stackName]
 	ecs.ECSLbArn = outputMap[ecsLbArn+"-"+stackName]

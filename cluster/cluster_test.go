@@ -17,7 +17,7 @@ var outputParams = []struct {
 	exportName  string
 	outputValue string
 }{
-	{clusterArn + "-" + stackName, clusterArn},
+	{stackName, clusterArn},
 	{ecsHostedZoneID + "-" + stackName, ecsHostedZoneID},
 	{albListener + "-" + stackName, albListener},
 	{ecsDNSName + "-" + stackName, ecsDNSName},

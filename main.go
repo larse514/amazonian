@@ -13,11 +13,6 @@ import (
 	"github.com/larse514/amazonian/service"
 )
 
-const (
-	containerTemplatePath = "ias/cloudformation/containertemplate.yml"
-	ecsTemplatePath       = "ias/cloudformation/ecs.yml"
-)
-
 func main() {
 	args, err := commandlineargs.GenerateArgs()
 	//if a required parameter is not specified, log error and exit
