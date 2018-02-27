@@ -1,5 +1,5 @@
 # amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian)
-Opensource tool to faciliate AWS application resource development.  Amazonian will either let you provide your own cluster, or create a new one for you.  
+Opensource tool to faciliate AWS application resource development.  
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />
