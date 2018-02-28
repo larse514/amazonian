@@ -61,6 +61,7 @@ func GenerateArgs() (CommandLineArgs, error) {
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 	//parse the values
+	println("serviceName ", *serviceNamePtr, " containerNamePTR ", *containerNamePtr, " clusterName ", *clusterNamePtr)
 	flag.Parse()
 	//validate arguments
 	err := validateArguments(*vpcPtr, *imagePtr, *imagePtr)
