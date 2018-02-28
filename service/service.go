@@ -66,6 +66,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 		println("error retrieving latest priority ", err.Error())
 		return err
 	}
+	//think through and refactor how to test this
 	ecsService.Priority = strconv.Itoa(priority + 1)
 
 	//get the parameters

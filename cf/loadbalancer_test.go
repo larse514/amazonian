@@ -81,3 +81,24 @@ func TestGetHighestPriortyLowerCase(t *testing.T) {
 		t.Fail()
 	}
 }
+
+//&elbv2.DescribeRulesOutput{}
+func TestGetHighestPriortyLowerCaseEmptyRules(t *testing.T) {
+
+	priority := getHighestPriorty(&elbv2.DescribeRulesOutput{})
+
+	if priority != 1 {
+		t.Log("priority ", priority, " invalid")
+		t.Fail()
+	}
+	priority = getHighestPriorty(createDescribeRules())
+	if priority != 7 {
+		t.Log("priority ", priority, " invalid")
+		t.Fail()
+	}
+	priority = getHighestPriorty(createDescribeRules())
+	if priority != 7 {
+		t.Log("priority ", priority, " invalid")
+		t.Fail()
+	}
+}
