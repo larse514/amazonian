@@ -3,13 +3,13 @@ Opensource tool to faciliate AWS container based application development.
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />
-The goal of amazonian is to abstract away the complexity of deploying continers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values, and amazonian will deploy, run, monitor, and secure your containers for you.  Its your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
+The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values, and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
 
 ## installation
-Eventually the plan is to add this as a commandline tool and distribute is to various targets.  I am thinking at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
+Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking of at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
 <br />
 <br />
-In the meantime there are two options to use amazonian.  <br />
+In the meantime there are two options to use amazonian:  <br />
 1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
 2) A full install and build <br />
 
@@ -28,7 +28,7 @@ The following describes the parameters amazonian uses.
 | Image          | Docker Repository Image to be deployed as a container                  | Yes      | None      |                                                         |
 | ServiceName    | Name of container service to be deployed                               | Yes      | None      |                                                         |
 | ContainerName  | Name of container to be deployed                                       | Yes      | None      |                                                         |
-| ClusterName    | Name ECS Cluster to use                                                | Yes      | None      | This will be expanded to include Fargate and Kubernetes |
+| ClusterName    | Name of ECS Cluster to use                                             | Yes      | None      | This will be expanded to include Fargate and Kubernetes |
 | ClusterExists  | Specify whether to use an existing cluster                             | No       | false     |                                                         |
 | Subnets        | List of VPC Subnets to deploy cluster to.                              | Sometimes       |           | Required if ClusterExists is false                      |
 | KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       |           |                                                         |
