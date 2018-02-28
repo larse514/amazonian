@@ -70,7 +70,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 	ecsService.Priority = strconv.Itoa(priority + 1)
 
 	//get the parameters
-	parameters := createServiceParameters(ecs, ecsService, stackName)
+	parameters := createServiceParameters(ecs, ecsService)
 	//grab the template
 	containerTemplate, err := assets.GetAsset(containerTemplatePath)
 	if err != nil {
@@ -79,6 +79,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 	}
 
 	//create the stack
+	println("Stack name ", stackName)
 	err = service.Executor.CreateStack(containerTemplate, stackName, parameters)
 	if err != nil {
 		println("Error processing create stack request ", err.Error())
@@ -95,7 +96,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 
 //CreateServiceParameters will create the Parameter list to generate a cluster service
 //todo- unit tests!!!
-func createServiceParameters(ecs *cluster.Ecs, service EcsService, clusterStackName string) []*cloudformation.Parameter {
+func createServiceParameters(ecs *cluster.Ecs, service EcsService) []*cloudformation.Parameter {
 	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template
