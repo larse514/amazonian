@@ -63,7 +63,7 @@ func GenerateArgs() (CommandLineArgs, error) {
 	//parse the values
 	flag.Parse()
 	//validate arguments
-	err := validateArguments(*vpcPtr, *imagePtr, *imagePtr, *serviceNamePtr, *containerNamePtr, *clusterNamePtr)
+	err := validateArguments(*vpcPtr, *imagePtr, *imagePtr)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
