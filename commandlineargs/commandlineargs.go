@@ -61,28 +61,30 @@ func GenerateArgs() (CommandLineArgs, error) {
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 	//parse the values
+	println(*serviceNamePtr)
 	flag.Parse()
+	args := CommandLineArgs{
+		VPC:            *vpcPtr,
+		HostedZoneName: *hostedZonePtr,
+		Image:          *imagePtr,
+		ServiceName:    *serviceNamePtr,
+		ContainerName:  *containerNamePtr,
+		ClusterName:    *clusterNamePtr,
+		ClusterExists:  *clusterExistsPtr,
+		SubnetIDs:      *subnetPrt,
+		KeyName:        *keyNamePrt,
+		ClusterSize:    *cluserSizePrt,
+		MaxSize:        *maxSizePrt,
+		InstanceType:   *instanceTypePrt,
+	}
+	fmt.Println(args)
 	//validate arguments
-	err := validateArguments(*vpcPtr, *imagePtr, *imagePtr)
+	err := validateArguments(*vpcPtr, *imagePtr, *hostedZonePtr)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
 		return CommandLineArgs{}, err
 	}
-
-	args := CommandLineArgs{}
-	args.VPC = *vpcPtr
-	args.HostedZoneName = *hostedZonePtr
-	args.Image = *imagePtr
-	args.ServiceName = *serviceNamePtr
-	args.ContainerName = *containerNamePtr
-	args.ClusterName = *clusterNamePtr
-	args.ClusterExists = *clusterExistsPtr
-	args.SubnetIDs = *subnetPrt
-	args.KeyName = *keyNamePrt
-	args.ClusterSize = *cluserSizePrt
-	args.MaxSize = *maxSizePrt
-	args.InstanceType = *instanceTypePrt
 
 	return args, nil
 
