@@ -35,3 +35,13 @@ func TestValidateArguments_pass(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestCreateRandomString(t *testing.T) {
+	val1 := createRandomString("STARTER")
+	val2 := createRandomString("STARTER")
+
+	if val1 == val2 {
+		t.Log("Val ", val1, " should not equal ", val2)
+		t.Fail()
+	}
+}

@@ -4,6 +4,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math/rand"
+	"strconv"
+)
+
+const (
+	service   = "service"
+	container = "container"
+	cluster   = "cluster"
 )
 
 //CommandLineArgs is a struct representing items pulled from the command line
@@ -43,9 +51,9 @@ func GenerateArgs() (CommandLineArgs, error) {
 	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
-	serviceNamePtr := flag.String("ServiceName", "", "Name ECS Service Name (Required)")
-	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
-	clusterNamePtr := flag.String("ClusterName", "", "Name ECS Cluster to use (Required)")
+	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
+	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
+	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
 	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists, defaults to false if not provided (Required)")
 	subnetPrt := flag.String("Subnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
 	keyNamePrt := flag.String("KeyName", "", "Key name to use for cluster (Required only if clusterExists is false)")
@@ -78,4 +86,9 @@ func GenerateArgs() (CommandLineArgs, error) {
 
 	return args, nil
 
+}
+
+func createRandomString(starterString string) string {
+	result := starterString + strconv.Itoa(rand.Intn(900000))
+	return result
 }

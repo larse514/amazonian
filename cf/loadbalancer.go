@@ -36,9 +36,11 @@ func getHighestPriorty(output *elbv2.DescribeRulesOutput) int {
 	priority := 1
 
 	for _, rule := range output.Rules {
+
 		i, err := strconv.Atoi(*rule.Priority)
 		if err != nil {
 			println("Error processing priority ", err.Error())
+			continue
 		}
 		if i > priority {
 			priority = i

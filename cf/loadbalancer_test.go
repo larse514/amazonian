@@ -34,7 +34,7 @@ func createDescribeRules() *elbv2.DescribeRulesOutput {
 	priority4 := "4"
 	priority7 := "7"
 
-	priority2 := "2"
+	priority2 := "default"
 
 	rules = append(rules, &elbv2.Rule{Priority: &priority1})
 	rules = append(rules, &elbv2.Rule{Priority: &priority2})
