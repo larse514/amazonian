@@ -20,7 +20,6 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-
 	// Initialize a session that the SDK uses to load
 	// credentials from the shared credentials file ~/.aws/credentials
 	// and configuration from the shared configuration file ~/.aws/config.
@@ -74,7 +73,8 @@ func main() {
 	serviceStruct.ServiceName = args.ServiceName
 	serviceStruct.ContainerName = args.ContainerName
 	serviceStruct.HostedZoneName = args.HostedZoneName
-
+	fmt.Println("service struct ", serviceStruct)
+	fmt.Println("serviceName ", args.ServiceName)
 	//attempt to create the service
 	err = serv.CreateService(&ecs, serviceStruct, args.ServiceName)
 
