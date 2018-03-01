@@ -33,7 +33,10 @@ func (lb mockGoodLoadBalancer) GetHighestPriority(listenerArn *string) (int, err
 func (lb mockBadLoadBalancer) GetHighestPriority(listenerArn *string) (int, error) {
 	return 10, errors.New("ERROR")
 }
-func (m mockGoodExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
+func (m mockGoodExecutor) CreateStack(templateBody string, sName string, parameters []*cloudformation.Parameter) error {
+	if sName != stackName {
+		return errors.New("INVALID STACK NAME")
+	}
 	return nil
 }
 func (m mockGoodExecutor) PauseUntilFinished(stackName string) error {

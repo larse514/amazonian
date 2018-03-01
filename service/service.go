@@ -79,7 +79,6 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 	}
 
 	//create the stack
-	println("Stack name ", stackName)
 	err = service.Executor.CreateStack(containerTemplate, stackName, parameters)
 	if err != nil {
 		println("Error processing create stack request ", err.Error())
