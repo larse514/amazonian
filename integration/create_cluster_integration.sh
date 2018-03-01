@@ -35,3 +35,7 @@ aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}"
 # echo | Testing default values |
 ./workdir/amazonian --VPC=vpc-c7aa77be --HostedZoneName=vssdevelopment.com \
 --Image=willejs/go-hello-world  --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1
+
+curl --fail https://${SERVICENAME}.vssdevelopment.com/
+aws cloudformation delete-stack --stack-name "${SERVICENAME}"
+aws cloudformation delete-stack --stack-name "${CLUSTERNAME}"

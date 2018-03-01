@@ -84,5 +84,8 @@ func main() {
 	}
 	serviceName := strings.ToLower(args.ServiceName)
 	dnsName := "https://" + serviceName + "." + args.HostedZoneName
+	os.Setenv("SERVICENAME", serviceName)
+	os.Setenv("CLUSTERNAME", args.ClusterName)
+
 	fmt.Printf("Successfully created Container Service: %s, with url: %s \n", args.ServiceName, dnsName)
 }
