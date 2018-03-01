@@ -1,6 +1,9 @@
 package commandlineargs
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 //Basic Test Testxxx
 //Benchmark Benchmarkxxx
@@ -42,6 +45,28 @@ func TestCreateRandomString(t *testing.T) {
 
 	if val1 == val2 {
 		t.Log("Val ", val1, " should not equal ", val2)
+		t.Fail()
+	}
+}
+
+func TestCreateRandomStringRandomSeed(t *testing.T) {
+	val1 := createRandomString("service")
+
+	if val1 == "service698081" {
+		t.Log("Val ", val1, " should not equal ")
+		t.Fail()
+	}
+}
+
+func TestCreateArgs(t *testing.T) {
+	args := createArgs()
+	if args.ServiceName == "" {
+		t.Log("service is nil")
+		t.Fail()
+	}
+
+	if args.ClusterName == "" || !strings.HasPrefix(args.ClusterName, cluster) {
+		t.Log("cluster name is invalid ", args.ClusterName)
 		t.Fail()
 	}
 }

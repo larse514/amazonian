@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
-	"strconv"
 )
 
 const (
@@ -47,6 +46,39 @@ func validateArguments(args ...string) error {
 
 //GenerateArgs is a method to parse command line arguments
 func GenerateArgs() (CommandLineArgs, error) {
+
+	args := createArgs()
+
+	println("sname ", args.ServiceName)
+
+	fmt.Println(args)
+	//validate arguments
+	err := validateArguments(args.VPC, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName)
+	//if a required parameter is not specified, log error and exit
+	if err != nil {
+		flag.PrintDefaults()
+		return CommandLineArgs{}, err
+	}
+
+	return args, nil
+
+}
+
+func createRandomString(starterString string) string {
+	result := starterString + randomString(8)
+	return result
+}
+func randomString(n int) string {
+	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+	return string(b)
+}
+
+func createArgs() CommandLineArgs {
 	//todo-refactor flags more for unit testing
 	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
@@ -76,22 +108,5 @@ func GenerateArgs() (CommandLineArgs, error) {
 		MaxSize:        *maxSizePrt,
 		InstanceType:   *instanceTypePrt,
 	}
-	println("sname ", args.ServiceName)
-
-	fmt.Println(args)
-	//validate arguments
-	err := validateArguments(*vpcPtr, *imagePtr, *hostedZonePtr)
-	//if a required parameter is not specified, log error and exit
-	if err != nil {
-		flag.PrintDefaults()
-		return CommandLineArgs{}, err
-	}
-
-	return args, nil
-
-}
-
-func createRandomString(starterString string) string {
-	result := starterString + strconv.Itoa(rand.Intn(900000))
-	return result
+	return args
 }

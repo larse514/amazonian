@@ -11,7 +11,12 @@ import (
 	"github.com/larse514/amazonian/cf"
 	"github.com/larse514/amazonian/cluster"
 	"github.com/larse514/amazonian/commandlineargs"
+	"github.com/larse514/amazonian/output"
 	"github.com/larse514/amazonian/service"
+)
+
+const (
+	fileName = "amazonian-output"
 )
 
 func main() {
@@ -83,9 +88,10 @@ func main() {
 		os.Exit(1)
 	}
 	serviceName := strings.ToLower(args.ServiceName)
-	dnsName := "https://" + serviceName + "." + args.HostedZoneName
-	os.Setenv("SERVICENAME", serviceName)
-	os.Setenv("CLUSTERNAME", args.ClusterName)
-
-	fmt.Printf("Successfully created Container Service: %s, with url: %s \n", args.ServiceName, dnsName)
+	url := "https://" + serviceName + "." + args.HostedZoneName
+	err = output.WriteOutputFile(output.Output{fileName, serviceName, args.ClusterName, url})
+	if err != nil {
+		fmt.Println("Error writing output file ", err.Error())
+	}
+	fmt.Printf("Successfully created Container Service: %s, with url: %s \n", args.ServiceName, url)
 }
