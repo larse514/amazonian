@@ -39,5 +39,6 @@ aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}"
 source amazonian-output
 
 curl --fail ${URL}
+echo "about to delete ${ServiceName} and ${ClusterName}"
 aws cloudformation delete-stack --stack-name "${ServiceName}"
 aws cloudformation delete-stack --stack-name "${ClusterName}"

@@ -89,7 +89,7 @@ func main() {
 	}
 	serviceName := strings.ToLower(args.ServiceName)
 	url := "https://" + serviceName + "." + args.HostedZoneName
-	err = output.WriteOutputFile(output.Output{fileName, serviceName, args.ClusterName, url})
+	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url})
 	if err != nil {
 		fmt.Println("Error writing output file ", err.Error())
 	}
