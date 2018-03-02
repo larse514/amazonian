@@ -68,7 +68,6 @@ func main() {
 		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
 		//todo-get VPC private subnets to work
 		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
-		fmt.Println("updated args ", args)
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
@@ -117,7 +116,7 @@ func main() {
 	}
 	serviceName := strings.ToLower(args.ServiceName)
 	url := "https://" + serviceName + "." + args.HostedZoneName
-	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url, args.VPCName, args.VPC})
+	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url, args.VPC, args.VPCName})
 	if err != nil {
 		fmt.Println("Error writing output file ", err.Error())
 	}
