@@ -1,6 +1,8 @@
 package cf
 
 import (
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
@@ -32,10 +34,9 @@ func (executor CFExecutor) CreateStack(templateBody string, stackName string, pa
 	_, err := executor.Client.CreateStack(input)
 	//if there's an error return it
 	if err != nil {
-		fmt.Println("Got error creating stack:")
-		fmt.Println(err.Error())
+		fmt.Println("Got error creating stack: ", err.Error())
 	}
-	return err
+	return errors.New("Error creating stack")
 
 }
 

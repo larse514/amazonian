@@ -62,6 +62,7 @@ func main() {
 			println("error creating vpc ", err.Error())
 			os.Exit(1)
 		}
+		fmt.Println("retrieved stack ", vpcStack.GoString())
 		//i'm sorry, need to really refactor this whole block
 		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+tenant)
 		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
