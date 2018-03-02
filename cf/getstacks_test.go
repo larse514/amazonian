@@ -145,3 +145,14 @@ func TestGetOutputValueNoValue(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetOutputValueMulit(t *testing.T) {
+	stacks := createOutputs(1)
+
+	val := GetOutputValue(*stacks.Stacks[0], "OUTPUTKEY") + "," + GetOutputValue(*stacks.Stacks[0], "OUTPUTKEY")
+
+	if val != "OUTPUTVALUE,OUTPUTVALUE" {
+		t.Log("invalid value ", val)
+		t.Fail()
+	}
+}

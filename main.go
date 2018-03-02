@@ -53,6 +53,9 @@ func main() {
 			println("error creating vpc ", err.Error())
 			os.Exit(1)
 		}
+	}
+	if !args.VPCExists && args.VPC == "" {
+		fmt.Println("VPC doesn't exist and VPCId was not provided, looking up values by name")
 		//let's grab the vpc to get out needed output values
 		vpcStack, err := stack.GetStack(&args.VPCName)
 		if err != nil {
@@ -64,7 +67,7 @@ func main() {
 		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
 		//todo-get VPC private subnets to work
 		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
-
+		fmt.Println("updated args ", args)
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
