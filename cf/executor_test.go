@@ -37,7 +37,7 @@ func TestCloudformationCreateStack(t *testing.T) {
 
 	err := executor.CreateStack(templateBody, stackName, nil)
 	if err != nil {
-		t.Log("Successful stack request return error")
+		t.Log("Successful stack request return error ", err.Error())
 		t.Fail()
 	}
 

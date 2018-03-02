@@ -35,8 +35,10 @@ func (executor CFExecutor) CreateStack(templateBody string, stackName string, pa
 	//if there's an error return it
 	if err != nil {
 		fmt.Println("Got error creating stack: ", err.Error())
+		return errors.New("Error creating stack")
+
 	}
-	return errors.New("Error creating stack")
+	return nil
 
 }
 
