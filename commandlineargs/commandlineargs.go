@@ -8,25 +8,30 @@ import (
 )
 
 const (
-	service   = "service"
-	container = "container"
-	cluster   = "cluster"
+	service    = "amazonian-service"
+	vpc        = "amazonian-vpc"
+	container  = "amazonian-container"
+	cluster    = "amazonian-cluster"
+	runeString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 //CommandLineArgs is a struct representing items pulled from the command line
 type CommandLineArgs struct {
-	VPC            string
-	HostedZoneName string
-	Image          string
-	ServiceName    string
-	ContainerName  string
-	ClusterName    string
-	ClusterExists  bool
-	SubnetIDs      string
-	KeyName        string
-	ClusterSize    string
-	MaxSize        string
-	InstanceType   string
+	VPC              string
+	VPCName          string
+	VPCExists        bool
+	HostedZoneName   string
+	Image            string
+	ServiceName      string
+	ContainerName    string
+	ClusterName      string
+	ClusterExists    bool
+	ClusterSubnetIDs string
+	WSSubnetIDs      string
+	KeyName          string
+	ClusterSize      string
+	MaxSize          string
+	InstanceType     string
 }
 
 //validateArguments method to validate all required command line args are specified
@@ -69,7 +74,7 @@ func createRandomString(starterString string) string {
 	return result
 }
 func randomString(n int) string {
-	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	var letter = []rune(runeString)
 
 	b := make([]rune, n)
 	for i := range b {
@@ -80,33 +85,41 @@ func randomString(n int) string {
 
 func createArgs() CommandLineArgs {
 	//todo-refactor flags more for unit testing
-	vpcPtr := flag.String("VPC", "", "VPC to deploy target group. (Required)")
+	vpcPtr := flag.String("VPCId", "", "VPC to deploy target group. (Required)")
+	vpcNamePrt := flag.String("VPCName", createRandomString(vpc), "VPC Name to deploy target group. (Required if VPCId is not passed)")
+	vpcExistsPtr := flag.Bool("VpcExists", false, "Specify whether VPC exists or should be created. (Defaults to false)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
 	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
 	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
-	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists, defaults to false if not provided")
-	subnetPrt := flag.String("Subnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
+	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists (Defaults to false)")
+	elbSubnetPtr := flag.String("ELBSubnets", "", "List of VPC Subnets to deploy Elastic Load Balancers to (Required only if clusterExists is false)")
+	clusterSubnetsPtr := flag.String("ClusterSubnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
+
 	keyNamePrt := flag.String("KeyName", "", "Key name to use for cluster (Required only if clusterExists is false)")
 	cluserSizePrt := flag.String("ClusterSize", "1", "Number of host machines for cluster (Required only if clusterExists is false)")
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 	//parse the values
+
 	flag.Parse()
 	args := CommandLineArgs{
-		VPC:            *vpcPtr,
-		HostedZoneName: *hostedZonePtr,
-		Image:          *imagePtr,
-		ServiceName:    *serviceNamePtr,
-		ContainerName:  *containerNamePtr,
-		ClusterName:    *clusterNamePtr,
-		ClusterExists:  *clusterExistsPtr,
-		SubnetIDs:      *subnetPrt,
-		KeyName:        *keyNamePrt,
-		ClusterSize:    *cluserSizePrt,
-		MaxSize:        *maxSizePrt,
-		InstanceType:   *instanceTypePrt,
+		VPC:              *vpcPtr,
+		VPCName:          *vpcNamePrt,
+		VPCExists:        *vpcExistsPtr,
+		HostedZoneName:   *hostedZonePtr,
+		Image:            *imagePtr,
+		ServiceName:      *serviceNamePtr,
+		ContainerName:    *containerNamePtr,
+		ClusterName:      *clusterNamePtr,
+		ClusterExists:    *clusterExistsPtr,
+		ClusterSubnetIDs: *clusterSubnetsPtr,
+		WSSubnetIDs:      *elbSubnetPtr,
+		KeyName:          *keyNamePrt,
+		ClusterSize:      *cluserSizePrt,
+		MaxSize:          *maxSizePrt,
+		InstanceType:     *instanceTypePrt,
 	}
 	return args
 }

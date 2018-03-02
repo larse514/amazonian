@@ -22,7 +22,6 @@ func (stack Stack) GetStack(stackName *string) (cloudformation.Stack, error) {
 	input := &cloudformation.DescribeStacksInput{StackName: stackName}
 
 	output, err := stack.Client.DescribeStacks(input)
-
 	if err != nil {
 		println("error: ", err.Error(), " received when trying to find stack: ", *stackName)
 		return cloudformation.Stack{}, err
@@ -36,4 +35,15 @@ func (stack Stack) GetStack(stackName *string) (cloudformation.Stack, error) {
 	}
 
 	return *output.Stacks[0], nil
+}
+
+//GetOutputValue method will retrieve an output value from Output array
+func GetOutputValue(stack cloudformation.Stack, key string) string {
+	for i := range stack.Outputs {
+		if *stack.Outputs[i].OutputKey == key {
+			// Found!
+			return *stack.Outputs[i].OutputValue
+		}
+	}
+	return ""
 }

@@ -124,3 +124,24 @@ func TestGetStackError(t *testing.T) {
 	}
 
 }
+
+func TestGetOutputValue(t *testing.T) {
+	stacks := createOutputs(1)
+
+	val := GetOutputValue(*stacks.Stacks[0], "OUTPUTKEY")
+
+	if val != "OUTPUTVALUE" {
+		t.Log("invalid value ", val)
+		t.Fail()
+	}
+}
+func TestGetOutputValueNoValue(t *testing.T) {
+	stacks := createOutputs(1)
+
+	val := GetOutputValue(*stacks.Stacks[0], "NOT FOUND")
+
+	if val != "" {
+		t.Log("invalid value returned, expected empty string but got", val)
+		t.Fail()
+	}
+}

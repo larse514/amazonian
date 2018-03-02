@@ -24,7 +24,9 @@ const (
 	//ecs cluster consts
 	domainNameParam      = "DomainName"
 	keyNameParam         = "KeyName"
-	subnetIDParam        = "SubnetId"
+	clusterSubnetIDParam = "ClusterSubnetId"
+	wsSubnetIDParam      = "WSSubnetId"
+
 	desiredCapacityParam = "DesiredCapacity"
 	maxSizeParam         = "MaxSize"
 	instanceTypeParam    = "InstanceType"
@@ -38,9 +40,8 @@ const (
 	ecsDNSName      = "ecslbdnsname"
 	ecsLbArn        = "ecslbarn"
 
-	//
-	containerTemplatePath = "ias/cloudformation/containertemplate.yml"
-	ecsTemplatePath       = "ias/cloudformation/ecs.yml"
+	//path to cloudformation template
+	ecsTemplatePath = "ias/cloudformation/ecs.yml"
 )
 
 //Cluster interface to expose operations to work with various conainter clusters
@@ -69,12 +70,13 @@ type Ecs struct {
 
 //EcsCluster is a struct which defines required files for an ECS Cluster
 type EcsCluster struct {
-	DomainName      string
-	KeyName         string
-	VpcID           string
-	SubnetIDs       string
-	DesiredCapacity string
-	MaxSize         string
+	DomainName       string
+	KeyName          string
+	VpcID            string
+	WSSubnetIds      string
+	ClusterSubnetIds string
+	DesiredCapacity  string
+	MaxSize          string
 	//todo- could make this first class citizen
 	InstanceType string
 }
@@ -148,7 +150,8 @@ func createClusterParameters(cluster EcsCluster) []*cloudformation.Parameter {
 	parameterMap[vpcParam] = cluster.VpcID
 	parameterMap[domainNameParam] = cluster.DomainName
 	parameterMap[keyNameParam] = cluster.KeyName
-	parameterMap[subnetIDParam] = cluster.SubnetIDs
+	parameterMap[clusterSubnetIDParam] = cluster.ClusterSubnetIds
+	parameterMap[wsSubnetIDParam] = cluster.WSSubnetIds
 	parameterMap[desiredCapacityParam] = cluster.DesiredCapacity
 	parameterMap[maxSizeParam] = cluster.MaxSize
 	parameterMap[instanceTypeParam] = cluster.InstanceType

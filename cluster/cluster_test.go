@@ -136,12 +136,11 @@ func TestEcsGetClusterFails(t *testing.T) {
 
 }
 func TestEcsCreateCluster(t *testing.T) {
-	clusterStruct := EcsCluster{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", SubnetIDs: "SUBNETS", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
+	clusterStruct := EcsCluster{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
 
 	ecs := Ecs{Executor: mockGoodExecutor{}}
 
 	err := ecs.CreateCluster(stackName, clusterStruct)
-	println("jere")
 
 	if err != nil {
 		t.Log("error is not nil when it should be ", err.Error())
@@ -152,14 +151,14 @@ func TestEcsCreateCluster(t *testing.T) {
 
 //CreateClusterParameters tests
 func TestCreateClusterParameters(t *testing.T) {
-	cluster := EcsCluster{DomainName: "DOMAINAME"}
+	clusterStruct := EcsCluster{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
 
-	params := createClusterParameters(cluster)
+	params := createClusterParameters(clusterStruct)
+	len := len(params)
+	if len != 8 {
+		t.Log("expected parameter length to be 8 but found ", len)
+		t.Fail()
 
-	if *params[0].ParameterKey != "DomainName" {
-		t.Log("paramkey ", params[0].ParameterKey, " did not get set to correct constant value")
 	}
-	if *params[0].ParameterValue != "DOMAINAME" {
-		t.Log("paramvalue ", params[0].ParameterValue, " did not get set to correct constant value")
-	}
+
 }

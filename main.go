@@ -11,14 +11,17 @@ import (
 	"github.com/larse514/amazonian/cf"
 	"github.com/larse514/amazonian/cluster"
 	"github.com/larse514/amazonian/commandlineargs"
+	"github.com/larse514/amazonian/network"
 	"github.com/larse514/amazonian/output"
 	"github.com/larse514/amazonian/service"
 )
 
 const (
 	fileName = "amazonian-output"
+	tenant   = "amazonian"
 )
 
+//Todo- refactor main to be testable
 func main() {
 	args, err := commandlineargs.GenerateArgs()
 	//if a required parameter is not specified, log error and exit
@@ -37,10 +40,32 @@ func main() {
 	elb := elbv2.New(sess)
 
 	//Initialize the dependencies
-	containerExecutor := cf.CFExecutor{Client: svc}
-	serv := service.EcsService{Executor: containerExecutor, LoadBalancer: cf.AWSElb{Client: elb}}
-	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: containerExecutor}
+	cfExecutor := cf.CFExecutor{Client: svc}
+	serv := service.EcsService{Executor: cfExecutor, LoadBalancer: cf.AWSElb{Client: elb}}
+	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: cfExecutor}
+	stack := cf.Stack{Client: svc}
 
+	if !args.VPCExists {
+		vpc := network.CreateDefaultVPC(args.VPCName, tenant)
+		vpc.Executor = cfExecutor
+		err := vpc.CreateNetwork()
+		if err != nil {
+			println("error creating vpc ", err.Error())
+			os.Exit(1)
+		}
+		//let's grab the vpc to get out needed output values
+		vpcStack, err := stack.GetStack(&args.VPCName)
+		if err != nil {
+			println("error creating vpc ", err.Error())
+			os.Exit(1)
+		}
+		//i'm sorry, need to really refactor this whole block
+		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+tenant)
+		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
+		//todo-get VPC private subnets to work
+		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
+
+	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
 		//create cluster
@@ -48,7 +73,8 @@ func main() {
 		clusterStruct.DomainName = args.HostedZoneName
 		clusterStruct.KeyName = args.KeyName
 		clusterStruct.VpcID = args.VPC
-		clusterStruct.SubnetIDs = args.SubnetIDs
+		clusterStruct.ClusterSubnetIds = args.ClusterSubnetIDs
+		clusterStruct.WSSubnetIds = args.WSSubnetIDs
 		clusterStruct.DesiredCapacity = args.ClusterSize
 		clusterStruct.MaxSize = args.MaxSize
 		clusterStruct.InstanceType = args.InstanceType
@@ -78,8 +104,6 @@ func main() {
 	serviceStruct.ServiceName = args.ServiceName
 	serviceStruct.ContainerName = args.ContainerName
 	serviceStruct.HostedZoneName = args.HostedZoneName
-	fmt.Println("service struct ", serviceStruct)
-	fmt.Println("serviceName ", args.ServiceName)
 	//attempt to create the service
 	err = serv.CreateService(&ecs, serviceStruct, args.ServiceName)
 
@@ -89,7 +113,7 @@ func main() {
 	}
 	serviceName := strings.ToLower(args.ServiceName)
 	url := "https://" + serviceName + "." + args.HostedZoneName
-	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url})
+	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url, args.VPCName, args.VPC})
 	if err != nil {
 		fmt.Println("Error writing output file ", err.Error())
 	}

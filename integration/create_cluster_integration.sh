@@ -1,44 +1,30 @@
 #!/bin/bash
 
 set -e
-##Test creation of cluster and container
-# echo | Test new cluster creation |
+##Test creation of vpc, cluster, and container with defaults
 
-CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
-CLUSTER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
+./workdir/amazonian --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --KeyName=dummy_key1 
 
-./workdir/amazonian --VPC=vpc-c7aa77be --HostedZoneName=vssdevelopment.com \
---Image=willejs/go-hello-world --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
---ClusterName=${CLUSTER_NAME} --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 \
-ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium
+source amazonian-output
 
-curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
+curl --fail https://${ServiceName}.vssdevelopment.com/
 
-aws cloudformation delete-stack --stack-name "${CONTAINER_NAME}"
+aws cloudformation delete-stack --stack-name "${ServiceName}"
 
-##Now test and ensure it can reuse the same cluster
+##Now test and ensure it can reuse the same cluster and vpc
 # echo | Test cluster reuse |
 
 CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
-./workdir/amazonian --VPC=vpc-c7aa77be --HostedZoneName=vssdevelopment.com \
+./workdir/amazonian --VPCId=${VPCId} --VpcExists --HostedZoneName=vssdevelopment.com \
 --Image=willejs/go-hello-world --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
---ClusterName=${CLUSTER_NAME} --ClusterExists
+--ClusterName=${ClusterName} --ClusterExists
 
 curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
 # echo | Cleaning up ${CONTAINER_NAME} and ${CLUSTER_NAME} |
 
-aws cloudformation delete-stack --stack-name "${CONTAINER_NAME}"
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}"
-
-##now test if the default values
-# echo | Testing default values |
-./workdir/amazonian --VPC=vpc-c7aa77be --HostedZoneName=vssdevelopment.com \
---Image=willejs/go-hello-world  --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1
-
 source amazonian-output
 
-curl --fail ${URL}
-echo "about to delete ${ServiceName} and ${ClusterName}"
-aws cloudformation delete-stack --stack-name "${ServiceName}"
+aws cloudformation delete-stack --stack-name "${CONTAINER_NAME}"
 aws cloudformation delete-stack --stack-name "${ClusterName}"
+aws cloudformation delete-stack --stack-name "${VPCName}"
