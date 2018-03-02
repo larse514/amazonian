@@ -3,20 +3,33 @@
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />
-The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values, and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
+the goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values, and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
 
-## installation
-Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking of at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
-<br />
-<br />
-In the meantime there are two options to use amazonian:  <br />
-1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
-2) A full install and build <br />
+## how can I use it?
+through the power of AWS ECS and Docker amazonian strives to keep things simple.  In order to get started there is only one command with two parameters that you need to deploy a working container 
+
+```bash
+$ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name>
+```
 
 # running amazonian
 
 once the amazonian binary is ready to run, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target it to facilitate CI/CD pipelines
 
+### setup
+
+Step 1: _AWS IAM User_ <br />
+amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
+[AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
+
+amazonian itself requires the following minimum permissions to execute:
+TO BE ADDED
+
+Step 2: _Route 53 Hosted Zone_ <br />
+in order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the requested servie.
+
+Step 3: _Docker Repository_ <br />
+the last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options
 ### parameters
 The following describes the parameters amazonian uses.
 
@@ -40,12 +53,14 @@ An example command of how you might run amazonian can be seen below:
 
 `./amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
 
-## environment setup
-amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
-[AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
 
-amazonian itself requires the following minimum permissions to execute:
-TO BE ADDED
+## installation
+Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking of at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
+<br />
+<br />
+In the meantime there are two options to use amazonian:  <br />
+1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
+2) A full install and build <br />
 
 # contributing
 If you would like to contribute to amazonian feel free to create a pull request or to fork the project itself. While amazonian is still under active development, and has not been released in any form, also feel free to raise issues as that will aide the development process.

@@ -3,7 +3,6 @@ package commandlineargs
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -41,7 +40,6 @@ func validateArguments(args ...string) error {
 		return errors.New("No command line args were specified")
 	}
 	for _, arg := range args {
-		println("arg: ", arg)
 		if arg == "" {
 			return errors.New("Unspecified required command line args")
 		}
@@ -51,12 +49,7 @@ func validateArguments(args ...string) error {
 
 //GenerateArgs is a method to parse command line arguments
 func GenerateArgs() (CommandLineArgs, error) {
-
 	args := createArgs()
-
-	println("sname ", args.ServiceName)
-
-	fmt.Println(args)
 	//validate arguments
 	err := validateArguments(args.VPCName, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName)
 	//if a required parameter is not specified, log error and exit
