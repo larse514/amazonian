@@ -50,7 +50,7 @@ func createOutputs(numOutputs int) *cloudformation.DescribeStacksOutput {
 	stack := cloudformation.Stack{}
 	outputs := make([]*cloudformation.Output, 0)
 	output := cloudformation.Output{}
-	output.SetOutputKey("OUTPUTKEY")
+	output.SetExportName("OUTPUTKEY")
 	output.SetOutputValue("OUTPUTVALUE")
 	outputs = append(outputs, &output)
 	stack.SetOutputs(outputs)
@@ -76,7 +76,7 @@ func TestGetStack(t *testing.T) {
 		t.Log("unexpected error encountered ", err.Error())
 		t.Fail()
 	}
-	outputKey := output.Outputs[0].OutputKey
+	outputKey := output.Outputs[0].ExportName
 	outputValue := output.Outputs[0].OutputValue
 
 	if *outputKey != "OUTPUTKEY" {
