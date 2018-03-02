@@ -43,7 +43,6 @@ func validateArguments(args ...string) error {
 	for _, arg := range args {
 		println("arg: ", arg)
 		if arg == "" {
-			fmt.Printf("argument %s missing", arg)
 			return errors.New("Unspecified required command line args")
 		}
 	}

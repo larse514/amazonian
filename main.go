@@ -62,7 +62,6 @@ func main() {
 			println("error creating vpc ", err.Error())
 			os.Exit(1)
 		}
-		fmt.Println("retrieved stack ", vpcStack.GoString())
 		//i'm sorry, need to really refactor this whole block
 		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+tenant)
 		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
@@ -116,7 +115,7 @@ func main() {
 	}
 	serviceName := strings.ToLower(args.ServiceName)
 	url := "https://" + serviceName + "." + args.HostedZoneName
-	err = output.WriteOutputFile(output.Output{fileName, args.ServiceName, args.ClusterName, url, args.VPC, args.VPCName})
+	err = output.WriteOutputFile(output.Output{FileName: fileName, ServiceName: args.ServiceName, ClusterName: args.ClusterName, ServiceURL: url, VPCId: args.VPC, VPCName: args.VPCName})
 	if err != nil {
 		fmt.Println("Error writing output file ", err.Error())
 	}

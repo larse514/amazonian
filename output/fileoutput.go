@@ -14,6 +14,6 @@ type Output struct {
 
 //WriteOutputFile writes output to a file
 func WriteOutputFile(output Output) error {
-	content := []byte("ServiceName=" + output.ServiceName + "\nClusterName=" + output.ClusterName + "\nURL=" + output.ServiceURL + "\nVPCId=" + output.VPCId + "VPCName=" + output.VPCName)
+	content := []byte("ServiceName=" + output.ServiceName + "\nClusterName=" + output.ClusterName + "\nURL=" + output.ServiceURL + "\nVPCId=" + output.VPCId + "\nVPCName=" + output.VPCName)
 	return ioutil.WriteFile(output.FileName, content, 0644)
 }
