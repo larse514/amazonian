@@ -58,7 +58,7 @@ func GenerateArgs() (CommandLineArgs, error) {
 
 	fmt.Println(args)
 	//validate arguments
-	err := validateArguments(args.VPC, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName)
+	err := validateArguments(args.VPCName, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
