@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 const (
@@ -74,6 +75,8 @@ func createRandomString(starterString string) string {
 	return result
 }
 func randomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+
 	var letter = []rune(runeString)
 
 	b := make([]rune, n)
