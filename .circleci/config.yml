@@ -15,7 +15,7 @@ jobs:
     # - restore_cache:
     #     keys:
     #       - v1-pkg-cache
-    # - run: go get github.com/jstemmer/go-junit-report
+    - run: go get github.com/jstemmer/go-junit-report
     - run: make dependencies
     # - run: make bindata
     - run:
@@ -24,9 +24,9 @@ jobs:
         #   CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
         #   CONTACTS_DB_MIGRATIONS: /go/src/github.com/CircleCI-Public/circleci-demo-go/db/migrations
         command: |
-          # trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
-          # make test | tee ${TEST_RESULTS}/go-test.out
-          make test
+          trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+          make test | tee ${TEST_RESULTS}/go-test.out
+          
     - run: make
     - run: 
         name: Configure AWS environment
