@@ -3,6 +3,7 @@ package cf
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
@@ -36,7 +37,9 @@ func getHighestPriorty(output *elbv2.DescribeRulesOutput) int {
 	priority := 1
 
 	for _, rule := range output.Rules {
-
+		if strings.EqualFold(*rule.Priority, "default") {
+			continue
+		}
 		i, err := strconv.Atoi(*rule.Priority)
 		if err != nil {
 			println("Error processing priority ", err.Error())

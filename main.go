@@ -18,7 +18,6 @@ import (
 
 const (
 	fileName = "amazonian-output"
-	tenant   = "workaround"
 )
 
 //Todo- refactor main to be testable
@@ -47,7 +46,7 @@ func main() {
 
 	if !args.VPCExists {
 		fmt.Println("VPC doesn't exist, creating...")
-		vpc := network.CreateDefaultVPC(args.VPCName, tenant)
+		vpc := network.CreateDefaultVPC(args.VPCName, args.Tenant)
 		vpc.Executor = cfExecutor
 		err := vpc.CreateNetwork()
 		if err != nil {
@@ -64,10 +63,10 @@ func main() {
 			os.Exit(1)
 		}
 		//i'm sorry, need to really refactor this whole block
-		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+tenant)
-		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
+		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+args.Tenant)
+		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+args.Tenant)
 		//todo-get VPC private subnets to work
-		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+tenant)
+		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+args.Tenant)
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {

@@ -13,6 +13,7 @@ const (
 	container  = "amazonian-container"
 	cluster    = "amazonian-cluster"
 	runeString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	tenant     = "amazonian"
 )
 
 //CommandLineArgs is a struct representing items pulled from the command line
@@ -33,6 +34,7 @@ type CommandLineArgs struct {
 	MaxSize          string
 	InstanceType     string
 	PortMapping      string
+	Tenant           string
 }
 
 //validateArguments method to validate all required command line args are specified
@@ -120,6 +122,7 @@ func createArgs() CommandLineArgs {
 		MaxSize:          *maxSizePrt,
 		InstanceType:     *instanceTypePrt,
 		PortMapping:      *portMappingPtr,
+		Tenant:           createRandomString(tenant),
 	}
 	return args
 }
