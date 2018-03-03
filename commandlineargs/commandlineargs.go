@@ -32,6 +32,7 @@ type CommandLineArgs struct {
 	ClusterSize      string
 	MaxSize          string
 	InstanceType     string
+	PortMapping      string
 }
 
 //validateArguments method to validate all required command line args are specified
@@ -51,7 +52,7 @@ func validateArguments(args ...string) error {
 func GenerateArgs() (CommandLineArgs, error) {
 	args := createArgs()
 	//validate arguments
-	err := validateArguments(args.VPCName, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName)
+	err := validateArguments(args.VPCName, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName, args.PortMapping)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
@@ -82,9 +83,12 @@ func createArgs() CommandLineArgs {
 	//todo-refactor flags more for unit testing
 	vpcPtr := flag.String("VPCId", "", "VPC to deploy target group. (Required)")
 	vpcNamePrt := flag.String("VPCName", createRandomString(vpc), "VPC Name to deploy target group. (Required if VPCId is not passed)")
+	portMappingPtr := flag.String("PortMapping", "", "Port used by container (Required)")
+
 	vpcExistsPtr := flag.Bool("VpcExists", false, "Specify whether VPC exists or should be created. (Defaults to false)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
+
 	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
 	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
@@ -115,6 +119,7 @@ func createArgs() CommandLineArgs {
 		ClusterSize:      *cluserSizePrt,
 		MaxSize:          *maxSizePrt,
 		InstanceType:     *instanceTypePrt,
+		PortMapping:      *portMappingPtr,
 	}
 	return args
 }

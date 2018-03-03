@@ -3,7 +3,7 @@
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />
-The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
+The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than what is required to run a cluster.
 
 ## how can I use it?
 Through the power of AWS ECS, Fargate, and Docker; amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a working container 
@@ -35,6 +35,8 @@ Once the amazonian binary is installed, it can be executed from the command line
 
 ## setup
 
+The following steps are required to configure your environment to be able to run amazonian
+
 **Step 1: _AWS IAM User_** <br />
 Amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
 [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
@@ -46,9 +48,9 @@ TO BE ADDED
 In order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Rather than create a unique load balancer, each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the desired service.
 
 **Step 3: _Docker Repository_** <br />
-The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options
+The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options.
 ### parameters
-The following describes the parameters amazonian uses.
+The following describes the parameters you can use to customize amazonian deployments.
 
 | Paramater      | Description                                                            | Required | Default   | Note                                                    |
 |----------------|------------------------------------------------------------------------|----------|-----------|---------------------------------------------------------|
@@ -72,14 +74,14 @@ An example command of how you might run amazonian can be seen below:
 
 
 ## installation
-Eventually the plan is to add this as a commandline tool and distribute it to various targets.  I am thinking of at least targeting MacOS (Homebrew) and at least one Linux OS (maybe ubuntu?).
+Eventually the plan is to add this as a commandline tool and distribute it to various targets.  MacOS (Homebrew) Ubuntu (Debian) are the first two targeted OS platform.
 <br />
 <br />
 In the meantime there are two options to use amazonian:  <br />
 1) Pull the binary from the temporary S3 distribution bucket here: [amazonian](https://s3.amazonaws.com/amazonian.package.release/latest/amazonian) <br />
 2) A full install and build <br />
 
-# contributing
+## contributing
 If you would like to contribute to amazonian feel free to create a pull request or to fork the project itself. While amazonian is still under active development, and has not been released in any form, also feel free to raise issues as that will aide the development process.
 
 ## development environment setup

@@ -18,7 +18,7 @@ import (
 
 const (
 	fileName = "amazonian-output"
-	tenant   = "amazonian"
+	tenant   = "workaround"
 )
 
 //Todo- refactor main to be testable
@@ -46,6 +46,7 @@ func main() {
 	stack := cf.Stack{Client: svc}
 
 	if !args.VPCExists {
+		fmt.Println("VPC doesn't exist, creating...")
 		vpc := network.CreateDefaultVPC(args.VPCName, tenant)
 		vpc.Executor = cfExecutor
 		err := vpc.CreateNetwork()
@@ -70,6 +71,8 @@ func main() {
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
+		fmt.Println("Cluster doesn't exist, creating...")
+
 		//create cluster
 		clusterStruct := cluster.EcsCluster{}
 		clusterStruct.DomainName = args.HostedZoneName
@@ -106,7 +109,10 @@ func main() {
 	serviceStruct.ServiceName = args.ServiceName
 	serviceStruct.ContainerName = args.ContainerName
 	serviceStruct.HostedZoneName = args.HostedZoneName
+	serviceStruct.PortMapping = args.PortMapping
 	//attempt to create the service
+	fmt.Println("Creating service %s...", args.ServiceName)
+
 	err = serv.CreateService(&ecs, serviceStruct, args.ServiceName)
 
 	if err != nil {

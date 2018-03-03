@@ -21,6 +21,7 @@ const (
 	imageParam           = "image"
 	serviceNameParam     = "ServiceName"
 	containerNameParam   = "ContainerName"
+	portMappingParam     = "PortMapping"
 
 	//ecs cluster consts
 	domainNameParam      = "DomainName"
@@ -50,6 +51,7 @@ type EcsService struct {
 	Image          string
 	ServiceName    string
 	ContainerName  string
+	PortMapping    string
 }
 
 //Leaving this here as a demonstration of my plan
@@ -107,11 +109,14 @@ func createServiceParameters(ecs *cluster.Ecs, service EcsService) []*cloudforma
 	parameterMap[hostedZoneNameParam] = service.HostedZoneName
 	parameterMap[serviceNameParam] = service.ServiceName
 	parameterMap[containerNameParam] = service.ContainerName
+	parameterMap[portMappingParam] = service.PortMapping
+	//cluster mappings
 	parameterMap[clusterARNParam] = ecs.ClusterArn
 	parameterMap[eLBHostedZoneIDParam] = ecs.ECSHostedZoneID
 	parameterMap[eLBDNSNameParam] = ecs.ECSDNSName
 	parameterMap[eLBARNParam] = ecs.ECSLbArn
 	parameterMap[aLBListenerARNParam] = ecs.AlbListener
+
 	//now convert the key value map to a list of cloudformation.Parameter 's
 	return cf.CreateCloudformationParameters(parameterMap)
 }
