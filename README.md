@@ -3,22 +3,24 @@
 
 ## what does amazonian do?
 ![ECS](docs/ecs.png) <br />
-the goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
+The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than the infrastructure required to run a cluster.
 
 ## how can I use it?
-through the power of AWS ECS and Docker amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a working container 
+Through the power of AWS ECS, Fargate, and Docker; amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a working container 
 
 ```bash
 $ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name>
 ```
 ## what is amazonian doing for me?
 
-amazonian leverages the cutting edge aws serivce to provide: <br />
+Amazonian leverages cutting edge aws serivces to provide: <br />
 
-* Realtime Metrics
-* Distributed Log Aggregate
-* TLS Certificate Management
-* Secure Network Provisions
+* **Realtime Monitoring and Application Metrics**
+* **Distributed Log Aggregate**
+* **TLS Certificate Management**
+* **Secure Network Provisions**
+
+These enable you to focus on growing your business, not maintaining servers
 
 <br />
 
@@ -29,22 +31,22 @@ amazonian leverages the cutting edge aws serivce to provide: <br />
 
 ## running amazonian
 
-once the amazonian binary is ready to run, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target it to facilitate CI/CD pipelines
+Once the amazonian binary is installed, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target is to facilitate CI/CD pipelines
 
-### setup
+## setup
 
 **Step 1: _AWS IAM User_** <br />
-amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
+Amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
 [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
 
-amazonian itself requires the following minimum permissions to execute:
+Amazonian itself requires the following minimum permissions to execute:
 TO BE ADDED
 
 **Step 2: _Route 53 Hosted Zone_** <br />
-in order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the requested servie.
+In order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Rather than create a unique load balancer, each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the desired service.
 
 **Step 3: _Docker Repository_** <br />
-the last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options
+The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options
 ### parameters
 The following describes the parameters amazonian uses.
 
