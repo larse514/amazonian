@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/larse514/amazonian/cf"
+	"github.com/larse514/amazonian/cloud"
 	"github.com/larse514/amazonian/cluster"
 	"github.com/larse514/amazonian/commandlineargs"
 	"github.com/larse514/amazonian/network"
@@ -43,78 +44,14 @@ func main() {
 	serv := service.EcsService{Executor: cfExecutor, LoadBalancer: cf.AWSElb{Client: elb}}
 	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: cfExecutor}
 	stack := cf.Stack{Client: svc}
+	vpc := network.VPC{Executor: cfExecutor}
 
-	if !args.VPCExists {
-		fmt.Print("VPC doesn't exist, creating %s...", args.VPCName)
-		vpc := network.CreateDefaultVPC(args.VPCName, args.Tenant)
-		vpc.Executor = cfExecutor
-		err := vpc.CreateNetwork()
-		if err != nil {
-			println("error creating vpc ", err.Error())
-			os.Exit(1)
-		}
-	}
-	if !args.VPCExists && args.VPC == "" {
-		//let's grab the vpc to get out needed output values
-		vpcStack, err := stack.GetStack(&args.VPCName)
-		if err != nil {
-			fmt.Println("error creating vpc ", err.Error())
-			os.Exit(1)
-		}
-		//i'm sorry, need to really refactor this whole block
-		args.VPC = cf.GetOutputValue(vpcStack, "VPC-"+args.Tenant)
-		args.WSSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+args.Tenant)
-		//todo-get VPC private subnets to work
-		args.ClusterSubnetIDs = cf.GetOutputValue(vpcStack, "WSSubnet1-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+args.Tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+args.Tenant)
-	}
-	//check if the cluster exists, if not create it
-	if !args.ClusterExists {
-		fmt.Printf("Cluster doesn't exist, creating %s...", args.ClusterName)
+	aws := cloud.AWS{Vpc: &vpc, Stack: &stack, Ecs: &ecs, Serv: &serv}
 
-		//create cluster
-		clusterStruct := cluster.EcsCluster{}
-		clusterStruct.DomainName = args.HostedZoneName
-		clusterStruct.KeyName = args.KeyName
-		clusterStruct.VpcID = args.VPC
-		clusterStruct.ClusterSubnetIds = args.ClusterSubnetIDs
-		clusterStruct.WSSubnetIds = args.WSSubnetIDs
-		clusterStruct.DesiredCapacity = args.ClusterSize
-		clusterStruct.MaxSize = args.MaxSize
-		clusterStruct.InstanceType = args.InstanceType
-		//create cluster
-		err = ecs.CreateCluster(args.ClusterName, clusterStruct)
-		if err != nil {
-			println("error creating cluster ", err.Error())
-			os.Exit(1)
-		}
-	}
-
-	//now get the cluster based on the stack name provided
-	ecs, err = ecs.GetCluster(args.ClusterName)
+	err = aws.CreateDeployment(args)
 
 	if err != nil {
-		fmt.Printf("error retrieving stack %s", args.ClusterName)
-		os.Exit(1)
-	}
-
-	//let's get the priority for the next service
-	// priority, err := cf.LoadBalancer.GetHighestPriority()
-	//create the service struct, this is the struct that defines everything we need to create a container service
-	//(note that for the time being only ECS is supported)
-	serviceStruct := service.EcsService{}
-	serviceStruct.Vpc = args.VPC
-	serviceStruct.Image = args.Image
-	serviceStruct.ServiceName = args.ServiceName
-	serviceStruct.ContainerName = args.ContainerName
-	serviceStruct.HostedZoneName = args.HostedZoneName
-	serviceStruct.PortMapping = args.PortMapping
-	//attempt to create the service
-	fmt.Printf("Creating service %s ...", args.ServiceName)
-
-	err = serv.CreateService(&ecs, serviceStruct, args.ServiceName)
-
-	if err != nil {
-		fmt.Printf("error creating service")
+		fmt.Printf("Error encountered when creating deployment %f", err)
 		os.Exit(1)
 	}
 	serviceName := strings.ToLower(args.ServiceName)

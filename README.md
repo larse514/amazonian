@@ -32,10 +32,10 @@ Addionally amazonian will create Cloudwatch dashboards to monitor your ECS Servi
 ![Service](docs/cloudwatch_service.png) <br />
 
 ### Distributed Logging- AWS Cloudwatch Logs
-Tradional logging becomes challenging when dealing with the ephemeral nature of containers.  Amazonian uses ECS's [awslogs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html) logging driver to output all logs as AWS Cloudwatch logs. These can then be viewed in the AWS Cloudwatch console.  All you need to do is ensure your application is logging to stdout and stderr
+Tradional logging becomes challenging when dealing with the ephemeral nature of containers.  Amazonian uses ECS's [awslogs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html) logging driver to output all logs as AWS Cloudwatch logs. These can then be viewed in the AWS console.  All you need to do is ensure your application is logging to stdout and stderr
 ![Logs](docs/cloudwatch_logs.png) <br />
 
-
+### TLS Certificate Management- Amazon Certificate Manager (ACM)
 <br />
 
 ## running amazonian

@@ -34,13 +34,35 @@ func (executor mockBadStackExecutor) CreateStack(templateBody string, stackName 
 func (executor mockBadStackExecutor) PauseUntilFinished(stackName string) error {
 	return nil
 }
+
+//helper method
+func createVPCInput() VPCInput {
+	vpc := VPCInput{Name: "NAME"}
+	vpc.Tenant = "TENANT"
+	vpc.CIDRBlock = "10.0.0.0/16"
+
+	vpc.WSSubnets = []Subnet{}
+	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.0/32"})
+	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.1/32"})
+	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.2/32"})
+	vpc.APPSubnets = []Subnet{}
+	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
+	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
+	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
+	vpc.DBSubnets = []Subnet{}
+	vpc.DBSubnets = append(vpc.DBSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
+	vpc.DBSubnets = append(vpc.DBSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
+	return vpc
+}
+
 func TestCreateNetwork(t *testing.T) {
 }
 
 func TestCreateVPCParameters(t *testing.T) {
-	vpc := createVPC(mockGoodExecutor{})
+	vpc := VPC{Executor: mockGoodExecutor{}}
+	input := createVPCInput()
 
-	parms := vpc.createVPCParameters()
+	parms := vpc.createVPCParameters(&input)
 	if parms == nil {
 		t.Fail()
 	}
@@ -51,8 +73,10 @@ func TestCreateVPCParameters(t *testing.T) {
 }
 
 func TestCreateVPC(t *testing.T) {
-	vpc := createVPC(mockGoodExecutor{})
-	err := vpc.CreateNetwork()
+	vpc := VPC{Executor: mockGoodExecutor{}}
+	input := createVPCInput()
+
+	err := vpc.CreateNetwork(&input)
 	if err != nil {
 		t.Log("error returned ", err.Error())
 		t.Fail()
@@ -60,8 +84,10 @@ func TestCreateVPC(t *testing.T) {
 
 }
 func TestCreateNetworkCreateStackErrors(t *testing.T) {
-	vpc := createVPC(mockBadStackExecutor{})
-	err := vpc.CreateNetwork()
+	vpc := VPC{Executor: mockBadStackExecutor{}}
+	input := createVPCInput()
+
+	err := vpc.CreateNetwork(&input)
 	if err == nil {
 		t.Log("error not return ")
 		t.Fail()
@@ -152,24 +178,4 @@ func TestCreateDefaultVPCTenat(t *testing.T) {
 		t.Fail()
 	}
 
-}
-
-//helper method
-func createVPC(executor cf.Executor) VPC {
-	vpc := VPC{Executor: executor}
-	vpc.Tenant = "TENANT"
-	vpc.CIDRBlock = "10.0.0.0/16"
-
-	vpc.WSSubnets = []Subnet{}
-	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.0/32"})
-	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.1/32"})
-	vpc.WSSubnets = append(vpc.WSSubnets, Subnet{cidrBlock: "10.0.0.2/32"})
-	vpc.APPSubnets = []Subnet{}
-	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
-	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
-	vpc.APPSubnets = append(vpc.APPSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
-	vpc.DBSubnets = []Subnet{}
-	vpc.DBSubnets = append(vpc.DBSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
-	vpc.DBSubnets = append(vpc.DBSubnets, Subnet{cidrBlock: "10.0.0.0/0"})
-	return vpc
 }

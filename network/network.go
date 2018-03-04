@@ -44,7 +44,11 @@ type Network interface {
 
 //VPC is a struct representing AWS VPC object
 type VPC struct {
-	Executor   cf.Executor
+	Executor cf.Executor
+}
+
+//VPCInput is a struct representing structure of VPC parameters
+type VPCInput struct {
 	Name       string
 	Tenant     string
 	CIDRBlock  string
@@ -59,46 +63,46 @@ type Subnet struct {
 }
 
 //CreateNetwork is a method to create a VPC network in AWS
-func (vpc VPC) CreateNetwork() error {
+func (vpc VPC) CreateNetwork(input *VPCInput) error {
 	//Grab VPC template
 	vpcTemplateBody, err := assets.GetAsset(vpcTemplate)
 	if err != nil {
 		fmt.Println("Error retrieving vpc template ", err.Error())
 		return errors.New("Error creating template body for vpc")
 	}
-	err = vpc.Executor.CreateStack(vpcTemplateBody, vpc.Name, vpc.createVPCParameters())
+	err = vpc.Executor.CreateStack(vpcTemplateBody, input.Name, vpc.createVPCParameters(input))
 	if err != nil {
 		fmt.Println("Error creating vpc stack ", err.Error())
 		return errors.New("Error creating vpc")
 	}
-	return vpc.Executor.PauseUntilFinished(vpc.Name)
+	return vpc.Executor.PauseUntilFinished(input.Name)
 }
 
 //CreateClusterParameters will create the Parameter list to generate an ecs cluster
 //todo- unit tests!!!
-func (vpc VPC) createVPCParameters() []*cloudformation.Parameter {
+func (vpc VPC) createVPCParameters(input *VPCInput) []*cloudformation.Parameter {
 	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template
 	//todo- refactor this approach
 	parameterMap := make(map[string]string, 0)
-	parameterMap[tenantParam] = vpc.Tenant
-	parameterMap[cidrBlockParam] = vpc.CIDRBlock
-	parameterMap[ws1CidrParam] = vpc.WSSubnets[0].cidrBlock
-	parameterMap[ws2CidrParam] = vpc.WSSubnets[1].cidrBlock
-	parameterMap[ws3CidrParam] = vpc.WSSubnets[2].cidrBlock
-	parameterMap[app1CidrParam] = vpc.APPSubnets[0].cidrBlock
-	parameterMap[app2CidrParam] = vpc.APPSubnets[1].cidrBlock
-	parameterMap[app3CidrParam] = vpc.APPSubnets[2].cidrBlock
-	parameterMap[db1CidrParam] = vpc.DBSubnets[0].cidrBlock
-	parameterMap[db2CidrParam] = vpc.DBSubnets[1].cidrBlock
+	parameterMap[tenantParam] = input.Tenant
+	parameterMap[cidrBlockParam] = input.CIDRBlock
+	parameterMap[ws1CidrParam] = input.WSSubnets[0].cidrBlock
+	parameterMap[ws2CidrParam] = input.WSSubnets[1].cidrBlock
+	parameterMap[ws3CidrParam] = input.WSSubnets[2].cidrBlock
+	parameterMap[app1CidrParam] = input.APPSubnets[0].cidrBlock
+	parameterMap[app2CidrParam] = input.APPSubnets[1].cidrBlock
+	parameterMap[app3CidrParam] = input.APPSubnets[2].cidrBlock
+	parameterMap[db1CidrParam] = input.DBSubnets[0].cidrBlock
+	parameterMap[db2CidrParam] = input.DBSubnets[1].cidrBlock
 	return cf.CreateCloudformationParameters(parameterMap)
 
 }
 
 //CreateDefaultVPC is a method to create default VPC with Default subn
-func CreateDefaultVPC(name string, tenant string) *VPC {
-	vpc := VPC{}
+func CreateDefaultVPC(name string, tenant string) *VPCInput {
+	vpc := VPCInput{}
 	vpc.Name = name
 	vpc.Tenant = tenant
 	vpc.CIDRBlock = cidrBlock
