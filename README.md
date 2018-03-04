@@ -16,17 +16,15 @@ $ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name> --Por
 Amazonian leverages cutting edge aws serivces to provide: <br />
 
 * **Realtime Monitoring and Application Metrics**
-* **Distributed Log Aggregate**
+* **Distributed Log Aggregation**
 * **TLS Certificate Management**
-* **Secure Network Provisions**
+* **Securely Provisioned Networks**
 
 These enable you to focus on growing your business, not maintaining servers
 
 <br />
 
 ![AWS](docs/aws.png) <br />
-
-
 
 
 ## running amazonian

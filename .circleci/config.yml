@@ -9,6 +9,8 @@ jobs:
     environment:
       TEST_RESULTS: /tmp/test-results
       IMAGE: larse514/gohelloworldservicecontainer:latest
+      IMAGE_TAG_2: larse514/gohelloworldservicecontainer:100
+
     steps:
     - checkout
     - run: mkdir -p $TEST_RESULTS
@@ -44,7 +46,7 @@ jobs:
         no_output_timeout: 30m
         command: |
           chmod +x integration/create_cluster_integration.sh
-          ./integration/create_cluster_integration.sh ${IMAGE}
+          ./integration/create_cluster_integration.sh ${IMAGE} ${IMAGE_TAG_2}
     - run:
         name: Release Binary
         command: |

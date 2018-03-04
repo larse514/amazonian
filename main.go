@@ -45,7 +45,7 @@ func main() {
 	stack := cf.Stack{Client: svc}
 
 	if !args.VPCExists {
-		fmt.Println("VPC doesn't exist, creating...")
+		fmt.Print("VPC doesn't exist, creating %s...", args.VPCName)
 		vpc := network.CreateDefaultVPC(args.VPCName, args.Tenant)
 		vpc.Executor = cfExecutor
 		err := vpc.CreateNetwork()
@@ -70,7 +70,7 @@ func main() {
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
-		fmt.Println("Cluster doesn't exist, creating...")
+		fmt.Printf("Cluster doesn't exist, creating %s...", args.ClusterName)
 
 		//create cluster
 		clusterStruct := cluster.EcsCluster{}
