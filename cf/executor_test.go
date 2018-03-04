@@ -84,3 +84,28 @@ func TestCloudformationWaitUntilStackCreateCompleteFails(t *testing.T) {
 	}
 
 }
+
+func TestCreateTagsLength(t *testing.T) {
+	tags := createTags()
+
+	if len(tags) != 1 {
+		t.Log("invalid number of tags")
+		t.Fail()
+	}
+}
+func TestCreateTagsKey(t *testing.T) {
+	tags := createTags()
+	key := *tags[0].Key
+	if key != amazonianKey {
+		t.Log("invalid number key expected ", amazonianKey, " found ", key)
+		t.Fail()
+	}
+}
+func TestCreateTagsValue(t *testing.T) {
+	tags := createTags()
+	value := *tags[0].Value
+	if value != amazonianValue {
+		t.Log("invalid number value expected ", amazonianValue, " found ", value)
+		t.Fail()
+	}
+}

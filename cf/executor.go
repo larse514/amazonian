@@ -10,6 +10,11 @@ import (
 	"fmt"
 )
 
+const (
+	amazonianKey   = "amazonian"
+	amazonianValue = "resource"
+)
+
 //Executor is an interface to execute and create stacks
 type Executor interface {
 	CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
@@ -30,6 +35,7 @@ func (executor CFExecutor) CreateStack(templateBody string, stackName string, pa
 	input.SetStackName(*aws.String(stackName))
 	input.SetParameters(parameters)
 	input.SetCapabilities(createCapability())
+	input.SetTags(createTags())
 	//todo-refactor to return output
 	_, err := executor.Client.CreateStack(input)
 	//if there's an error return it
@@ -63,4 +69,12 @@ func createCapability() []*string {
 	capabilities = append(capabilities, &capIAM)
 
 	return capabilities
+}
+
+func createTags() []*cloudformation.Tag {
+	tags := make([]*cloudformation.Tag, 0)
+	key := amazonianKey
+	value := amazonianValue
+	tags = append(tags, &cloudformation.Tag{Key: &key, Value: &value})
+	return tags
 }
