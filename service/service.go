@@ -16,7 +16,7 @@ const (
 	eLBHostedZoneIDParam = "ecslbhostedzoneid"
 	eLBDNSNameParam      = "ecslbdnsname"
 	eLBARNParam          = "ecslbarn"
-	clusterARNParam      = "ecscluster"
+	clusterARNParam      = "EcsInput"
 	aLBListenerARNParam  = "alblistener"
 	ecsLBFullNameParam   = "ecslbfullname"
 	imageParam           = "image"
@@ -39,13 +39,17 @@ const (
 
 //Service is used to create a generic Container Service
 type Service interface {
-	CreateService(parameterMap map[string]string) (string, error)
+	CreateService(ecs *cluster.EcsOutput, input *EcsServiceInput) error
 }
 
 //EcsService is used to create a ECS Container Service
 type EcsService struct {
-	Executor       cf.Executor
-	LoadBalancer   cf.LoadBalancer
+	Executor     cf.Executor
+	LoadBalancer cf.LoadBalancer
+}
+
+//EcsServiceInput is used as input to create a ECS Container Service
+type EcsServiceInput struct {
 	Vpc            string
 	Priority       string
 	HostedZoneName string
@@ -62,18 +66,19 @@ type EcsService struct {
 // }
 
 //CreateService is a method that creates a service for an ecs service
-func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService, stackName string) error {
+func (service EcsService) CreateService(ecs *cluster.EcsOutput, input *EcsServiceInput) error {
 	//Now grab the priority
 	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
 	if err != nil {
 		println("error retrieving latest priority ", err.Error())
 		return err
 	}
+
 	//think through and refactor how to test this
-	ecsService.Priority = strconv.Itoa(priority + 1)
+	input.Priority = strconv.Itoa(priority + 1)
 
 	//get the parameters
-	parameters := createServiceParameters(ecs, ecsService)
+	parameters := createServiceParameters(ecs, input)
 	//grab the template
 	containerTemplate, err := assets.GetAsset(containerTemplatePath)
 	if err != nil {
@@ -82,13 +87,13 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 	}
 
 	//create the stack
-	err = service.Executor.CreateStack(containerTemplate, stackName, parameters)
+	err = service.Executor.CreateStack(containerTemplate, input.ServiceName, parameters)
 	if err != nil {
 		println("Error processing create stack request ", err.Error())
 		return err
 	}
 	//then wait
-	err = service.Executor.PauseUntilFinished(stackName)
+	err = service.Executor.PauseUntilFinished(input.ServiceName)
 	if err != nil {
 		println("Error while attempting to wait for stack to finish processing ", err.Error())
 		return err
@@ -98,7 +103,7 @@ func (service EcsService) CreateService(ecs *cluster.Ecs, ecsService EcsService,
 
 //CreateServiceParameters will create the Parameter list to generate a cluster service
 //todo- unit tests!!!
-func createServiceParameters(ecs *cluster.Ecs, service EcsService) []*cloudformation.Parameter {
+func createServiceParameters(ecs *cluster.EcsOutput, service *EcsServiceInput) []*cloudformation.Parameter {
 	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template

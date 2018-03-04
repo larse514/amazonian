@@ -116,23 +116,23 @@ func TestGetVpc(t *testing.T) {
 	cloud := AWS{Stack: mockGoodStack{}}
 	vpcForPtr := vpc
 	tenantForVpc := tenant
-	vpcID, ws, cl, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
+	output, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
 
 	if err != nil {
 		t.Log("retrieved unexepected error ", err.Error())
 		t.Fail()
 	}
 
-	if vpcID != vpcOutput {
-		t.Log("invalid vpcId expected ", vpcOutput, " got ", vpcID)
+	if output.VPCID != vpcOutput {
+		t.Log("invalid vpcId expected ", vpcOutput, " got ", output.VPCID)
 	}
-	if ws != wsSubnetIds {
-		t.Log("invalid wsSubnetIds expected ", wsSubnetIds, " got ", ws)
+	if output.WSSubnetIDs != wsSubnetIds {
+		t.Log("invalid wsSubnetIds expected ", wsSubnetIds, " got ", output.WSSubnetIDs)
 		t.Fail()
 
 	}
-	if cl != wsSubnetIds {
-		t.Log("invalid clSubnetIds expected ", wsSubnetIds, " got ", cl)
+	if output.CLSubnetIDs != wsSubnetIds {
+		t.Log("invalid clSubnetIds expected ", wsSubnetIds, " got ", output.CLSubnetIDs)
 		t.Fail()
 	}
 
@@ -142,7 +142,7 @@ func TestGetVpcFails(t *testing.T) {
 	cloud := AWS{Stack: mockBadStack{}}
 	vpcForPtr := vpc
 	tenantForVpc := tenant
-	_, _, _, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
+	_, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
 
 	if err == nil {
 		t.Log("no error returned")
@@ -150,3 +150,7 @@ func TestGetVpcFails(t *testing.T) {
 	}
 
 }
+
+// func TestCreateCluster(t *testing.T) {
+// 	cluster :=
+// }

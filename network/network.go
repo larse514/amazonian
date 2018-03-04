@@ -57,6 +57,12 @@ type VPCInput struct {
 	DBSubnets  []Subnet
 }
 
+type VPCOutput struct {
+	VPCID       string
+	WSSubnetIDs string
+	CLSubnetIDs string
+}
+
 //Subnet is a struct representing a subnet (not the best description i'll admit)
 type Subnet struct {
 	cidrBlock string

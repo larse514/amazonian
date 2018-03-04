@@ -38,13 +38,17 @@ const (
 type Cluster interface {
 	GetCluster(stackName string) (Cluster, error)
 	GetParameters() (map[string]string, error)
-	CreateClusterNew(clusterName string, cluster EcsCluster) error
+	CreateClusterNew(cluster EcsInput) error
 }
 
 //Ecs is an implementation of an ECS cluster
 type Ecs struct {
-	Resource        cf.Resource
-	Executor        cf.Executor
+	Resource cf.Resource
+	Executor cf.Executor
+}
+
+//EcsOutput is the output generated when creating an ECS Cluster via Cloudformation
+type EcsOutput struct {
 	StackName       string
 	ClusterArn      string
 	ECSHostedZoneID string
@@ -59,8 +63,9 @@ type Ecs struct {
 // type Parameter interface {
 // }
 
-//EcsCluster is a struct which defines required files for an ECS Cluster
-type EcsCluster struct {
+//EcsInput is a struct which defines required files for an ECS Cluster
+type EcsInput struct {
+	ClusterName      string
 	DomainName       string
 	KeyName          string
 	VpcID            string
@@ -74,24 +79,25 @@ type EcsCluster struct {
 
 //GetCluster is a method to return an ECS cluster
 //todo- should this just be refactored to a constructor-like implementation?
-func (ecs Ecs) GetCluster(stackName string) (Ecs, error) {
+func (ecs Ecs) GetCluster(stackName string) (EcsOutput, error) {
 	stack, err := ecs.Resource.GetStack(&stackName)
 
 	if err != nil {
 		println("error retrieving stack ", err.Error())
-		return ecs, err
+		return EcsOutput{}, err
 	}
 
 	outputMap := getOutputParameters(&stack)
 	//todo- I know, hard coded convention =/
-	ecs.ClusterArn = outputMap[stackName]
-	ecs.ECSHostedZoneID = outputMap[ecsHostedZoneID+"-"+stackName]
-	ecs.ECSDNSName = outputMap[ecsDNSName+"-"+stackName]
-	ecs.ECSLbArn = outputMap[ecsLbArn+"-"+stackName]
-	ecs.AlbListener = outputMap[albListener+"-"+stackName]
-	ecs.ECSLbFullName = outputMap[ecsLBFullName+"-"+stackName]
+	output := EcsOutput{}
+	output.ClusterArn = outputMap[stackName]
+	output.ECSHostedZoneID = outputMap[ecsHostedZoneID+"-"+stackName]
+	output.ECSDNSName = outputMap[ecsDNSName+"-"+stackName]
+	output.ECSLbArn = outputMap[ecsLbArn+"-"+stackName]
+	output.AlbListener = outputMap[albListener+"-"+stackName]
+	output.ECSLbFullName = outputMap[ecsLBFullName+"-"+stackName]
 
-	return ecs, nil
+	return output, nil
 }
 
 //getOutputParameters will retrieve the Ecs Cluster exported parameters
@@ -105,7 +111,7 @@ func getOutputParameters(stack *cloudformation.Stack) map[string]string {
 }
 
 //CreateCluster will create an ECS cluster
-func (ecs Ecs) CreateCluster(clusterName string, cluster EcsCluster) error {
+func (ecs Ecs) CreateCluster(cluster EcsInput) error {
 	//create the parameters
 	clusterParams := createClusterParameters(cluster)
 	//grab template
@@ -114,15 +120,15 @@ func (ecs Ecs) CreateCluster(clusterName string, cluster EcsCluster) error {
 	if err != nil {
 		os.Exit(1)
 	}
-	ecs.StackName = clusterName
+
 	//create the stack
-	err = ecs.Executor.CreateStack(ecsTemplate, clusterName, clusterParams)
+	err = ecs.Executor.CreateStack(ecsTemplate, cluster.ClusterName, clusterParams)
 	if err != nil {
 		println("Error processing create stack request ", err.Error())
 		return err
 	}
 	//then wait
-	err = ecs.Executor.PauseUntilFinished(clusterName)
+	err = ecs.Executor.PauseUntilFinished(cluster.ClusterName)
 
 	if err != nil {
 		println("Error while attempting to wait for stack to finish processing ", err.Error())
@@ -134,7 +140,7 @@ func (ecs Ecs) CreateCluster(clusterName string, cluster EcsCluster) error {
 
 //CreateClusterParameters will create the Parameter list to generate an ecs cluster
 //todo- unit tests!!!
-func createClusterParameters(cluster EcsCluster) []*cloudformation.Parameter {
+func createClusterParameters(cluster EcsInput) []*cloudformation.Parameter {
 	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template

@@ -2,7 +2,6 @@ package cloud
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/larse514/amazonian/cluster"
 	"github.com/larse514/amazonian/commandlineargs"
@@ -21,8 +20,8 @@ type Cloud interface {
 type AWS struct {
 	Vpc   network.Network
 	Stack cf.Resource
-	Ecs   *cluster.Ecs
-	Serv  *service.EcsService
+	Ecs   cluster.Ecs
+	Serv  service.Service
 }
 
 //CreateDeployment is method to create networking (VPC, Subnets, etc) for AWS
@@ -45,14 +44,14 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		//it might make sense since these are specific string, not the same thing.  That is to say
 		//order is important, therefore they should be treated differently..okay i talked myself into
 		//it, adding as refactor in backlog
-		vpcID, wsSubnetIDs, clusterSubnetIDs, err := aws.getVPC(&args.VPCName, &args.Tenant)
+		output, err := aws.getVPC(&args.VPCName, &args.Tenant)
 
 		if err != nil {
 			return err
 
 		}
 		//create aws ECS cluster
-		err = aws.createCluster(&vpcID, &wsSubnetIDs, &clusterSubnetIDs, args)
+		err = aws.createCluster(&output, args)
 		if err != nil {
 			return err
 
@@ -64,16 +63,10 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 
 	if err != nil {
 		fmt.Printf("error retrieving stack %s", args.ClusterName)
-		os.Exit(1)
-	}
-
-	err = aws.deployService(&ecs, args)
-
-	if err != nil {
-		fmt.Printf("error creating service")
 		return err
 	}
-	return nil
+
+	return aws.deployService(&ecs, args)
 }
 
 //createVPC is a private method used to create an AWS VPC based on passed in argument
@@ -93,12 +86,12 @@ func (aws AWS) createVPC(args *commandlineargs.CommandLineArgs) error {
 }
 
 //getVPC is a method to return vpcID, wsSubnetsIDs, and clusterSubnetIDs
-func (aws AWS) getVPC(vpcName *string, tenant *string) (string, string, string, error) {
+func (aws AWS) getVPC(vpcName *string, tenant *string) (network.VPCOutput, error) {
 	//let's grab the vpc to get needed output values
 	vpcStack, err := aws.Stack.GetStack(vpcName)
 	if err != nil {
 		fmt.Println("error creating vpc ", err.Error())
-		return "", "", "", err
+		return network.VPCOutput{}, err
 	}
 	//i'm sorry, need to really refactor this whole block
 	vpcID := cf.GetOutputValue(vpcStack, "VPC-"+*tenant)
@@ -106,24 +99,25 @@ func (aws AWS) getVPC(vpcName *string, tenant *string) (string, string, string, 
 	//todo-get VPC private subnets to work
 	clusterSubnetIDs := cf.GetOutputValue(vpcStack, "WSSubnet1-"+*tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet2-"+*tenant) + "," + cf.GetOutputValue(vpcStack, "WSSubnet3-"+*tenant)
 
-	return vpcID, wsSubnetIDs, clusterSubnetIDs, nil
+	return network.VPCOutput{VPCID: vpcID, WSSubnetIDs: wsSubnetIDs, CLSubnetIDs: clusterSubnetIDs}, nil
 }
 
 //createCluster is a private method to create a cluster if it doesn't exist
-func (aws AWS) createCluster(vpcID *string, wsSubnetIds *string, clSubnetIds *string, args *commandlineargs.CommandLineArgs) error {
+func (aws AWS) createCluster(output *network.VPCOutput, args *commandlineargs.CommandLineArgs) error {
 
 	//create cluster
-	clusterStruct := cluster.EcsCluster{}
+	clusterStruct := cluster.EcsInput{}
 	clusterStruct.DomainName = args.HostedZoneName
 	clusterStruct.KeyName = args.KeyName
-	clusterStruct.VpcID = *vpcID
-	clusterStruct.ClusterSubnetIds = *clSubnetIds
-	clusterStruct.WSSubnetIds = *wsSubnetIds
+	clusterStruct.VpcID = output.VPCID
+	clusterStruct.ClusterSubnetIds = output.CLSubnetIDs
+	clusterStruct.WSSubnetIds = output.WSSubnetIDs
 	clusterStruct.DesiredCapacity = args.ClusterSize
 	clusterStruct.MaxSize = args.MaxSize
 	clusterStruct.InstanceType = args.InstanceType
+	clusterStruct.ClusterName = args.ClusterName
 	//create cluster
-	err := aws.Ecs.CreateCluster(args.ClusterName, clusterStruct)
+	err := aws.Ecs.CreateCluster(clusterStruct)
 	if err != nil {
 		println("error creating cluster ", err.Error())
 		return err
@@ -132,10 +126,10 @@ func (aws AWS) createCluster(vpcID *string, wsSubnetIds *string, clSubnetIds *st
 }
 
 //deployService is a private method to deploy an AWS ECS Service
-func (aws AWS) deployService(ecs *cluster.Ecs, args *commandlineargs.CommandLineArgs) error {
+func (aws AWS) deployService(ecs *cluster.EcsOutput, args *commandlineargs.CommandLineArgs) error {
 	//create the service struct, this is the struct that defines everything we need to create a container service
 	//(note that for the time being only ECS is supported)
-	serviceStruct := service.EcsService{}
+	serviceStruct := service.EcsServiceInput{}
 	serviceStruct.Vpc = args.VPC
 	serviceStruct.Image = args.Image
 	serviceStruct.ServiceName = args.ServiceName
@@ -144,6 +138,6 @@ func (aws AWS) deployService(ecs *cluster.Ecs, args *commandlineargs.CommandLine
 	serviceStruct.PortMapping = args.PortMapping
 	//attempt to create the service
 	fmt.Printf("Creating service %s ...", args.ServiceName)
-	return aws.Serv.CreateService(ecs, serviceStruct, args.ServiceName)
+	return aws.Serv.CreateService(ecs, &serviceStruct)
 
 }
