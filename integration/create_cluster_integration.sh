@@ -36,7 +36,7 @@ curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 #now we want to test if we can deploy a new version
 
 ./workdir/amazonian --VPCId=${VPCId} --VpcExists=true --HostedZoneName=vssdevelopment.com \
---Image=${images} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
+--Image=${image2} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
 --ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/

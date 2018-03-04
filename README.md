@@ -31,7 +31,7 @@ In addition to creating your ECS cluster amazonian will also create a Cloudwatch
 Addionally amazonian will create Cloudwatch dashboards to monitor your ECS Services Memory and CPU utilization; as well as total request count and response time.  *(Note- request count is the sum total per minute while response time is based on 95th percentile)*  
 ![Service](docs/cloudwatch_service.png) <br />
 
-### Distributed Logging- Cloudwatch Logs
+### Distributed Logging- AWS Cloudwatch Logs
 Tradional logging becomes challenging when dealing with the ephemeral nature of containers.  Amazonian uses ECS's [awslogs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html) logging driver to output all logs as AWS Cloudwatch logs. These can then be viewed in the AWS Cloudwatch console.  All you need to do is ensure your application is logging to stdout and stderr
 ![Logs](docs/cloudwatch_logs.png) <br />
 
