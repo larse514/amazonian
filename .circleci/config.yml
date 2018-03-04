@@ -12,9 +12,9 @@ jobs:
     - checkout
     - run: mkdir -p $TEST_RESULTS
 
-    - restore_cache:
-        keys:
-          - v1-pkg-cache
+    # - restore_cache:
+    #     keys:
+    #       - v1-pkg-cache
     - run: go get github.com/jstemmer/go-junit-report
     - run: make dependencies
     # - run: make bindata
