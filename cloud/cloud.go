@@ -57,21 +57,21 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 			return err
 
 		}
-		//now get the cluster based on the stack name provided
-		ecs, err := aws.Ecs.GetCluster(args.ClusterName)
 
-		if err != nil {
-			fmt.Printf("error retrieving stack %s", args.ClusterName)
-			os.Exit(1)
-		}
+	}
+	//now get the cluster based on the stack name provided
+	ecs, err := aws.Ecs.GetCluster(args.ClusterName)
 
-		err = aws.deployService(&ecs, args)
+	if err != nil {
+		fmt.Printf("error retrieving stack %s", args.ClusterName)
+		os.Exit(1)
+	}
 
-		if err != nil {
-			fmt.Printf("error creating service")
-			return err
-		}
+	err = aws.deployService(&ecs, args)
 
+	if err != nil {
+		fmt.Printf("error creating service")
+		return err
 	}
 	return nil
 }
