@@ -40,6 +40,7 @@ func (stack Stack) GetStack(stackName *string) (cloudformation.Stack, error) {
 //GetOutputValue method will retrieve an output value from Output array
 func GetOutputValue(stack cloudformation.Stack, key string) string {
 	for i := range stack.Outputs {
+		println(*stack.Outputs[i].ExportName+" ", key)
 		if *stack.Outputs[i].ExportName == key {
 			// Found!
 			return *stack.Outputs[i].OutputValue

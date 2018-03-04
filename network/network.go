@@ -39,7 +39,7 @@ const (
 //Network is an interface to define operations with which to create
 //cloud provider networks
 type Network interface {
-	CreateNetwork() error
+	CreateNetwork(input *VPCInput) error
 }
 
 //VPC is a struct representing AWS VPC object

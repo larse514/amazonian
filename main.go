@@ -48,7 +48,7 @@ func main() {
 
 	aws := cloud.AWS{Vpc: &vpc, Stack: &stack, Ecs: &ecs, Serv: &serv}
 
-	err = aws.CreateDeployment(args)
+	err = aws.CreateDeployment(&args)
 
 	if err != nil {
 		fmt.Printf("Error encountered when creating deployment %f", err)
