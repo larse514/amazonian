@@ -11,17 +11,21 @@ jobs:
     steps:
     - checkout
     - run: mkdir -p $TEST_RESULTS
-    - run: 
-        name: Install AWS since circleci is broken
+    - run:
+        name: Install AWS cli since circleci is broken
+        # environment:
+        #   CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
+        #   CONTACTS_DB_MIGRATIONS: /go/src/github.com/CircleCI-Public/circleci-demo-go/db/migrations
         command: |
-        wget "s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip" && \
-        unzip awscli-bundle.zip && \
-        # Workaround to get awscli to work properly
-        # https://github.com/aws/aws-cli/issues/1957#issuecomment-271057166
-        sudo apt-get install groff-base && \
-        sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
-        rm awscli-bundle.zip && \
-        rm -rf awscli-bundle
+          wget "s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip" && \
+          unzip awscli-bundle.zip && \
+          # Workaround to get awscli to work properly
+          # https://github.com/aws/aws-cli/issues/1957#issuecomment-271057166
+          sudo apt-get install groff-base && \
+          sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
+          rm awscli-bundle.zip && \
+          rm -rf awscli-bundle
+
     # - restore_cache:
     #     keys:
     #       - v1-pkg-cache
