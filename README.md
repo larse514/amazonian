@@ -23,19 +23,20 @@ Amazonian leverages cutting edge aws serivces to provide: <br />
 These enable you to focus on growing your business, not maintaining servers.  Here's how:
 
 ### Realtime Monitoring and Application Metrics- AWS Cloudwatch
-AWS Cloudwatch offers realtime monitoring and metrics through the use of alarms, metrics, and dashboards.  These can be setup through direct integrations with AWS services leveraged by amazonian, including ECS clusters and Load Balancers. <br/>
+AWS Cloudwatch offers realtime monitoring and metrics through the use of alarms, metrics, and dashboards.  These are setup through direct integrations with AWS services leveraged by amazonian. <br/>
 
-Once a cluster is created amazonian will create a Cloudwatch dashboard to monitor your cluster's Autoscaling and EC2 instances CPU and Memory consumption
+In addition to creating your ECS cluster amazonian will also create a Cloudwatch dashboard to monitor your cluster's Autoscaling and EC2 instances CPU and Memory consumption
 ![Cloudwatch](docs/cloudwatch_cluster.png) <br />
 
-Amazonian will also create Cloudwatch dashboards to monitor your ECS Services Memory and CPU utilization as well as total request count and response time.  (Note- request count is the sum total per minute while response time is based on 95th percentile)  
+Addionally amazonian will create Cloudwatch dashboards to monitor your ECS Services Memory and CPU utilization; as well as total request count and response time.  *(Note- request count is the sum total per minute while response time is based on 95th percentile)*  
 ![Service](docs/cloudwatch_service.png) <br />
+
+### Distributed Logging- Cloudwatch Logs
+Tradional logging becomes challenging when dealing with the ephemeral nature of containers.  Amazonian uses ECS's [awslogs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html) logging driver to output all logs as AWS Cloudwatch logs. These can then be viewed in the AWS Cloudwatch console.  All you need to do is ensure your application is logging to stdout and stderr
+![Logs](docs/cloudwatch_logs.png) <br />
 
 
 <br />
-
-![AWS](docs/aws.png) <br />
-
 
 ## running amazonian
 
