@@ -55,7 +55,6 @@ func main() {
 		}
 	}
 	if !args.VPCExists && args.VPC == "" {
-		fmt.Println("VPC doesn't exist and VPCId was not provided, looking up values by name")
 		//let's grab the vpc to get out needed output values
 		vpcStack, err := stack.GetStack(&args.VPCName)
 		if err != nil {

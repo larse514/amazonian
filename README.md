@@ -20,7 +20,17 @@ Amazonian leverages cutting edge aws serivces to provide: <br />
 * **TLS Certificate Management**
 * **Securely Provisioned Networks**
 
-These enable you to focus on growing your business, not maintaining servers
+These enable you to focus on growing your business, not maintaining servers.  Here's how:
+
+### Realtime Monitoring and Application Metrics- AWS Cloudwatch
+AWS Cloudwatch offers realtime monitoring and metrics through the use of alarms, metrics, and dashboards.  These can be setup through direct integrations with AWS services leveraged by amazonian, including ECS clusters and Load Balancers. <br/>
+
+Once a cluster is created amazonian will create a Cloudwatch dashboard to monitor your cluster's Autoscaling and EC2 instances CPU and Memory consumption
+![Cloudwatch](docs/cloudwatch_cluster.png) <br />
+
+Amazonian will also create Cloudwatch dashboards to monitor your ECS Services Memory and CPU utilization as well as total request count and response time.  (Note- request count is the sum total per minute while response time is based on 95th percentile)  
+![Service](docs/cloudwatch_service.png) <br />
+
 
 <br />
 
