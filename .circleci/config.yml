@@ -3,33 +3,26 @@ jobs:
   build:
     working_directory: /go/src/github.com/larse514/amazonian
     docker:
-      - image: circleci/golang:1.8
+      - image: larse514/circleci-golang:latest
     # environment:
     #   - BUCKET_NAME: "moodle.sites.lambda.deployment"
     environment:
       TEST_RESULTS: /tmp/test-results
+      IMAGE: larse514/gohelloworldservicecontainer:latest
     steps:
     - checkout
     - run: mkdir -p $TEST_RESULTS
-    - run:
-        name: Install AWS cli since circleci is broken
-        # environment:
-        #   CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
-        #   CONTACTS_DB_MIGRATIONS: /go/src/github.com/CircleCI-Public/circleci-demo-go/db/migrations
-        command: |
-          wget "s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip" && \
-          unzip awscli-bundle.zip && \
-          # Workaround to get awscli to work properly
-          # https://github.com/aws/aws-cli/issues/1957#issuecomment-271057166
-          sudo apt-get install groff-base && \
-          sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
-          rm awscli-bundle.zip && \
-          rm -rf awscli-bundle
 
-    # - restore_cache:
-    #     keys:
-    #       - v1-pkg-cache
+    - restore_cache:
+        keys:
+          - v1-pkg-cache
+    # # Normally, this step would be in a custom primary image;
+    # # we've added it here for the sake of explanation.
+    # - run: go get github.com/lib/pq
+    # - run: go get github.com/mattes/migrate
     - run: go get github.com/jstemmer/go-junit-report
+    # - run: go get github.com/jstemmer/go-junit-report
+    # - run: go get github.com/aws/aws-sdk-go/service/cloudformation
     - run: make dependencies
     # - run: make bindata
     - run:
@@ -40,7 +33,6 @@ jobs:
         command: |
           trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
           make test | tee ${TEST_RESULTS}/go-test.out
-          
     - run: make
     - run: 
         name: Configure AWS environment
@@ -52,7 +44,7 @@ jobs:
         no_output_timeout: 30m
         command: |
           chmod +x integration/create_cluster_integration.sh
-          ./integration/create_cluster_integration.sh
+          ./integration/create_cluster_integration.sh ${IMAGE}
     - run:
         name: Release Binary
         command: |

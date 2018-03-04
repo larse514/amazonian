@@ -3,7 +3,9 @@
 set -e
 ##Test creation of vpc, cluster, and container with defaults
 
-./workdir/amazonian --HostedZoneName=vssdevelopment.com --Image=willejs/go-hello-world --PortMapping=8080
+image=$1
+
+./workdir/amazonian --HostedZoneName=vssdevelopment.com --Image=${image} --PortMapping=8080
 
 source amazonian-output
 
@@ -17,7 +19,7 @@ aws cloudformation delete-stack --stack-name "${ServiceName}"
 CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 ./workdir/amazonian --VPCId=${VPCId} --VpcExists=true --HostedZoneName=vssdevelopment.com \
---Image=willejs/go-hello-world --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
+--Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
 --ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
