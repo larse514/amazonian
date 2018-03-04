@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	amazonianKey   = "amazonian"
-	amazonianValue = "resource"
+	amazonianKey   = "resource"
+	amazonianValue = "amazonian"
 )
 
 //Executor is an interface to execute and create stacks

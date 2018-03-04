@@ -24,10 +24,18 @@ CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
 # echo | Cleaning up ${CONTAINER_NAME} and ${CLUSTER_NAME} |
+CONTAINER_NAME2=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
+./workdir/amazonian --VPCId=${VPCId} --VpcExists=true --HostedZoneName=vssdevelopment.com \
+--Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
+--ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
+
+curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 source amazonian-output
 
-echo "about to delete ${CONTAINER_NAME} ${ClusterName} and ${VPCName}"
+echo "about to delete ${CONTAINER_NAME} ${CONTAINER_NAME2} ${ClusterName} and ${VPCName}"
+
 aws cloudformation delete-stack --stack-name "${CONTAINER_NAME}"
+aws cloudformation delete-stack --stack-name "${CONTAINER_NAME2}"
 aws cloudformation delete-stack --stack-name "${ClusterName}"
 aws cloudformation delete-stack --stack-name "${VPCName}"
