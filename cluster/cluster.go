@@ -9,17 +9,6 @@ import (
 )
 
 const (
-	//ECS Container Service consts
-	priorityParam        = "Priority"
-	hostedZoneNameParam  = "HostedZoneName"
-	eLBHostedZoneIDParam = "ecslbhostedzoneid"
-	eLBDNSNameParam      = "ecslbdnsname"
-	eLBARNParam          = "ecslbarn"
-	clusterARNParam      = "ecscluster"
-	aLBListenerARNParam  = "alblistener"
-	imageParam           = "image"
-	serviceNameParam     = "ServiceName"
-	containerNameParam   = "ContainerName"
 
 	//ecs cluster consts
 	domainNameParam      = "DomainName"
@@ -30,13 +19,14 @@ const (
 	desiredCapacityParam = "DesiredCapacity"
 	maxSizeParam         = "MaxSize"
 	instanceTypeParam    = "InstanceType"
+
 	//shared consts
 	vpcParam = "VpcId"
 
 	//export param names
-	clusterArn      = "ecscluster"
 	ecsHostedZoneID = "ecslbhostedzoneid"
 	albListener     = "alblistener"
+	ecsLBFullName   = "ecslbfullname"
 	ecsDNSName      = "ecslbdnsname"
 	ecsLbArn        = "ecslbarn"
 
@@ -61,6 +51,7 @@ type Ecs struct {
 	AlbListener     string
 	ECSDNSName      string
 	ECSLbArn        string
+	ECSLbFullName   string
 }
 
 //Parameter is an interface to defined methods to retrieve various Cloudformation template
@@ -98,6 +89,7 @@ func (ecs Ecs) GetCluster(stackName string) (Ecs, error) {
 	ecs.ECSDNSName = outputMap[ecsDNSName+"-"+stackName]
 	ecs.ECSLbArn = outputMap[ecsLbArn+"-"+stackName]
 	ecs.AlbListener = outputMap[albListener+"-"+stackName]
+	ecs.ECSLbFullName = outputMap[ecsLBFullName+"-"+stackName]
 
 	return ecs, nil
 }
@@ -155,6 +147,7 @@ func createClusterParameters(cluster EcsCluster) []*cloudformation.Parameter {
 	parameterMap[desiredCapacityParam] = cluster.DesiredCapacity
 	parameterMap[maxSizeParam] = cluster.MaxSize
 	parameterMap[instanceTypeParam] = cluster.InstanceType
+
 	return cf.CreateCloudformationParameters(parameterMap)
 
 }

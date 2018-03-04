@@ -9,7 +9,7 @@ The goal of amazonian is to abstract away the complexity of deploying containers
 Through the power of AWS ECS, Fargate, and Docker; amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a working container 
 
 ```bash
-$ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name>
+$ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name> --PortMapping=<Container Port>
 ```
 ## what is amazonian doing for me?
 

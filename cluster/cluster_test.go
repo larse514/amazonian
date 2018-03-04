@@ -11,6 +11,7 @@ import (
 const (
 	stackName  = "STACKNAME"
 	stackValue = "VALUE-" + stackName
+	clusterArn = "ecscluster"
 )
 
 var outputParams = []struct {

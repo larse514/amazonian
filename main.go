@@ -59,7 +59,7 @@ func main() {
 		//let's grab the vpc to get out needed output values
 		vpcStack, err := stack.GetStack(&args.VPCName)
 		if err != nil {
-			println("error creating vpc ", err.Error())
+			fmt.Println("error creating vpc ", err.Error())
 			os.Exit(1)
 		}
 		//i'm sorry, need to really refactor this whole block
@@ -110,7 +110,7 @@ func main() {
 	serviceStruct.HostedZoneName = args.HostedZoneName
 	serviceStruct.PortMapping = args.PortMapping
 	//attempt to create the service
-	fmt.Println("Creating service %s...", args.ServiceName)
+	fmt.Printf("Creating service %s ...", args.ServiceName)
 
 	err = serv.CreateService(&ecs, serviceStruct, args.ServiceName)
 
