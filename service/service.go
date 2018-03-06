@@ -19,10 +19,12 @@ const (
 	clusterARNParam      = "EcsInput"
 	aLBListenerARNParam  = "alblistener"
 	ecsLBFullNameParam   = "ecslbfullname"
-	imageParam           = "image"
-	serviceNameParam     = "ServiceName"
-	containerNameParam   = "ContainerName"
-	portMappingParam     = "PortMapping"
+	ecsClusterParam      = "ecscluster"
+
+	imageParam         = "image"
+	serviceNameParam   = "ServiceName"
+	containerNameParam = "ContainerName"
+	portMappingParam   = "PortMapping"
 
 	//ecs cluster consts
 	domainNameParam      = "DomainName"
@@ -123,6 +125,7 @@ func createServiceParameters(ecs *cluster.EcsOutput, service *EcsServiceInput) [
 	parameterMap[eLBARNParam] = ecs.ECSLbArn
 	parameterMap[aLBListenerARNParam] = ecs.AlbListener
 	parameterMap[ecsLBFullNameParam] = ecs.ECSLbFullName
+	parameterMap[ecsClusterParam] = ecs.StackName
 
 	//now convert the key value map to a list of cloudformation.Parameter 's
 	return cf.CreateCloudformationParameters(parameterMap)

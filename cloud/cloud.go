@@ -28,6 +28,8 @@ type AWS struct {
 func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 	//check if vpc exists, if not attempt to create it
 	if !args.VPCExists {
+		fmt.Printf("VPC doesn't exist, creating %s...\n", args.VPCName)
+
 		err := aws.createVPC(args)
 
 		if err != nil {
@@ -65,13 +67,13 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		fmt.Printf("error retrieving stack %s", args.ClusterName)
 		return err
 	}
+	fmt.Printf("Creating service %s ...", args.ServiceName)
 
 	return aws.deployService(&ecs, args)
 }
 
 //createVPC is a private method used to create an AWS VPC based on passed in argument
 func (aws AWS) createVPC(args *commandlineargs.CommandLineArgs) error {
-	fmt.Printf("VPC doesn't exist, creating %s...", args.VPCName)
 	//VPC doesn't exist so let's create a VPC with default secure values
 	vpcInput := network.CreateDefaultVPC(args.VPCName, args.Tenant)
 	//attempt to create VPC
@@ -137,7 +139,6 @@ func (aws AWS) deployService(ecs *cluster.EcsOutput, args *commandlineargs.Comma
 	serviceStruct.HostedZoneName = args.HostedZoneName
 	serviceStruct.PortMapping = args.PortMapping
 	//attempt to create the service
-	fmt.Printf("Creating service %s ...", args.ServiceName)
 	return aws.Serv.CreateService(ecs, &serviceStruct)
 
 }

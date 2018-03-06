@@ -36,6 +36,7 @@ Tradional logging becomes challenging when dealing with the ephemeral nature of 
 ![Logs](docs/cloudwatch_logs.png) <br />
 
 ### TLS Certificate Management- Amazon Certificate Manager (ACM)
+Amazonian uses [AWS ACM](https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html) to create a wild card cert that is used to secure all endpoints.  
 <br />
 
 ## running amazonian
