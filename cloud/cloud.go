@@ -13,14 +13,14 @@ import (
 
 //Cloud is an interface representating actions to take on a Cloud provider
 type Cloud interface {
-	CreateDeployment()
+	CreateDeployment(args *commandlineargs.CommandLineArgs)
 }
 
 //AWS is an implementation of Cloud interface representing AWS cloud
 type AWS struct {
 	Vpc   network.Network
 	Stack cf.Resource
-	Ecs   cluster.Ecs
+	Ecs   cluster.Cluster
 	Serv  service.Service
 }
 
@@ -106,18 +106,18 @@ func (aws AWS) getVPC(vpcName *string, tenant *string) (network.VPCOutput, error
 func (aws AWS) createCluster(output *network.VPCOutput, args *commandlineargs.CommandLineArgs) error {
 
 	//create cluster
-	clusterStruct := cluster.EcsInput{}
-	clusterStruct.DomainName = args.HostedZoneName
-	clusterStruct.KeyName = args.KeyName
-	clusterStruct.VpcID = output.VPCID
-	clusterStruct.ClusterSubnetIds = output.CLSubnetIDs
-	clusterStruct.WSSubnetIds = output.WSSubnetIDs
-	clusterStruct.DesiredCapacity = args.ClusterSize
-	clusterStruct.MaxSize = args.MaxSize
-	clusterStruct.InstanceType = args.InstanceType
-	clusterStruct.ClusterName = args.ClusterName
+	ecsInput := cluster.EcsInput{}
+	ecsInput.DomainName = args.HostedZoneName
+	ecsInput.KeyName = args.KeyName
+	ecsInput.VpcID = output.VPCID
+	ecsInput.ClusterSubnetIds = output.CLSubnetIDs
+	ecsInput.WSSubnetIds = output.WSSubnetIDs
+	ecsInput.DesiredCapacity = args.ClusterSize
+	ecsInput.MaxSize = args.MaxSize
+	ecsInput.InstanceType = args.InstanceType
+	ecsInput.ClusterName = args.ClusterName
 	//create cluster
-	err := aws.Ecs.CreateCluster(clusterStruct)
+	err := aws.Ecs.CreateCluster(ecsInput)
 	if err != nil {
 		println("error creating cluster ", err.Error())
 		return err

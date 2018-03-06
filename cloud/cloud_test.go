@@ -6,6 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/larse514/amazonian/cf"
+	"github.com/larse514/amazonian/cluster"
+	"github.com/larse514/amazonian/service"
 
 	"github.com/larse514/amazonian/commandlineargs"
 
@@ -82,10 +84,100 @@ func (stack mockBadStack) GetStack(stackName *string) (cloudformation.Stack, err
 	return cloudformation.Stack{}, errors.New("STACK ERROR")
 }
 
-//helper methods
+type mockGoodCluster struct {
+	Resource cf.Resource
+	Executor cf.Executor
+}
 
+func (client mockGoodCluster) GetCluster(stackName string) (cluster.EcsOutput, error) {
+	return cluster.EcsOutput{}, nil
+}
+func (client mockGoodCluster) GetParameters() (map[string]string, error) {
+	return nil, nil
+}
+func (client mockGoodCluster) CreateCluster(input cluster.EcsInput) error {
+	args := createCommandLineArgs()
+	output := createVPCOutput()
+	//todo- coudl check all params
+	if input.ClusterName != args.ClusterName {
+		return errors.New("invalid ClusterName")
+	}
+	if output.VPCID != input.VpcID {
+		return errors.New("invalid VpcID expected " + input.VpcID + " got " + output.VPCID)
+
+	}
+	return nil
+}
+
+type mockBadCluster struct {
+	Resource cf.Resource
+	Executor cf.Executor
+}
+
+func (client mockBadCluster) GetCluster(stackName string) (cluster.EcsOutput, error) {
+	return cluster.EcsOutput{}, nil
+}
+func (client mockBadCluster) GetParameters() (map[string]string, error) {
+	return nil, nil
+}
+func (client mockBadCluster) CreateCluster(input cluster.EcsInput) error {
+	return errors.New("UNIT TEST ERROR")
+}
+
+type mockGoodService struct {
+	Executor     cf.Executor
+	LoadBalancer cf.LoadBalancer
+}
+
+func (service mockGoodService) CreateService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
+	return nil
+}
+
+type mockBadService struct {
+	Executor     cf.Executor
+	LoadBalancer cf.LoadBalancer
+}
+
+func (service mockBadService) CreateService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
+	return errors.New("UNIT TEST ERROR")
+}
+
+//helper methods
 func createCommandLineArgs() *commandlineargs.CommandLineArgs {
-	return &commandlineargs.CommandLineArgs{VPC: "VPC"}
+	args := commandlineargs.CommandLineArgs{}
+
+	args.VPC = "VPC"
+	args.Image = "IMAGE"
+	args.ServiceName = "SERVICENAME"
+	args.ContainerName = "CONTAINRENAME"
+	args.HostedZoneName = "HOSTEDNAME"
+	args.PortMapping = "PORT"
+	return &args
+}
+
+func createVPCOutput() *network.VPCOutput {
+	return &network.VPCOutput{VPCID: "VPCOUTPUT"}
+}
+func createECSServiceOutput() *cluster.EcsOutput {
+	return &cluster.EcsOutput{StackName: "StackName"}
+}
+
+//public method tests
+
+func TestCreateDeployment(t *testing.T) {
+	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
+
+	args := createCommandLineArgs()
+	args.Tenant = tenant
+	args.VPCExists = false
+	args.ClusterExists = false
+	err := cloud.CreateDeployment(args)
+
+	if err != nil {
+		t.Log("Error returned when it shouldn't, ", err.Error())
+		t.Fail()
+	}
+
 }
 func TestCreateVPC(t *testing.T) {
 	cloud := AWS{Vpc: mockGoodVPC{}}
@@ -151,6 +243,63 @@ func TestGetVpcFails(t *testing.T) {
 
 }
 
-// func TestCreateCluster(t *testing.T) {
-// 	cluster :=
-// }
+func TestCreateCluster(t *testing.T) {
+	cloud := AWS{Ecs: mockGoodCluster{}}
+	args := createCommandLineArgs()
+	output := createVPCOutput()
+	err := cloud.createCluster(output, args)
+
+	if err != nil {
+		t.Log("error returned ", err.Error())
+		t.Fail()
+	}
+
+}
+
+func TestCreateClusterFails(t *testing.T) {
+	cloud := AWS{Ecs: mockBadCluster{}}
+	args := createCommandLineArgs()
+	output := createVPCOutput()
+	err := cloud.createCluster(output, args)
+
+	if err == nil {
+		t.Log("error not returned when it shoudl return UNIT TEST ERROR ")
+		t.Fail()
+	}
+
+	if err.Error() != "UNIT TEST ERROR" {
+		t.Log("Incorrect error returned expected UNIT TEST ERROR but got: ", err.Error())
+		t.Fail()
+	}
+
+}
+
+func TestDeployService(t *testing.T) {
+	cloud := AWS{Serv: mockGoodService{}}
+	args := createCommandLineArgs()
+	output := createECSServiceOutput()
+	err := cloud.deployService(output, args)
+
+	if err != nil {
+		t.Log("error returned ", err.Error())
+		t.Fail()
+	}
+
+}
+func TestDeployServiceFails(t *testing.T) {
+	cloud := AWS{Serv: mockBadService{}}
+	args := createCommandLineArgs()
+	output := createECSServiceOutput()
+	err := cloud.deployService(output, args)
+
+	if err == nil {
+		t.Log("error not returned when it shoudl return UNIT TEST ERROR ")
+		t.Fail()
+	}
+
+	if err.Error() != "UNIT TEST ERROR" {
+		t.Log("Incorrect error returned expected UNIT TEST ERROR but got: ", err.Error())
+		t.Fail()
+	}
+
+}

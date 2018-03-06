@@ -36,9 +36,8 @@ const (
 
 //Cluster interface to expose operations to work with various conainter clusters
 type Cluster interface {
-	GetCluster(stackName string) (Cluster, error)
-	GetParameters() (map[string]string, error)
-	CreateClusterNew(cluster EcsInput) error
+	GetCluster(stackName string) (EcsOutput, error)
+	CreateCluster(cluster EcsInput) error
 }
 
 //Ecs is an implementation of an ECS cluster
