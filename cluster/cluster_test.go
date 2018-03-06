@@ -11,7 +11,7 @@ import (
 const (
 	stackName  = "STACKNAME"
 	stackValue = "VALUE-" + stackName
-	clusterArn = "ecscluster"
+	clusterArn = "EcsInput"
 )
 
 var outputParams = []struct {
@@ -84,26 +84,26 @@ func TestEcsGetCluster(t *testing.T) {
 
 	ecs := Ecs{Resource: mockGoodResource{}}
 
-	ecs, _ = ecs.GetCluster(stackName)
+	output, _ := ecs.GetCluster(stackName)
 
-	if ecs.ClusterArn != outputParams[0].outputValue {
-		t.Log("mismatch in output key ", ecs.ClusterArn, " with ", outputParams[0].outputValue)
+	if output.ClusterArn != outputParams[0].outputValue {
+		t.Log("mismatch in output key ", output.ClusterArn, " with ", outputParams[0].outputValue)
 		t.Fail()
 	}
-	if ecs.ECSHostedZoneID != outputParams[1].outputValue {
-		t.Log("mismatch in output key ", ecs.ECSHostedZoneID, " with ", outputParams[1].outputValue)
+	if output.ECSHostedZoneID != outputParams[1].outputValue {
+		t.Log("mismatch in output key ", output.ECSHostedZoneID, " with ", outputParams[1].outputValue)
 		t.Fail()
 	}
-	if ecs.AlbListener != outputParams[2].outputValue {
-		t.Log("mismatch in output key ", ecs.AlbListener, " with ", outputParams[2].outputValue)
+	if output.AlbListener != outputParams[2].outputValue {
+		t.Log("mismatch in output key ", output.AlbListener, " with ", outputParams[2].outputValue)
 		t.Fail()
 	}
-	if ecs.ECSDNSName != outputParams[3].outputValue {
-		t.Log("mismatch in output key ", ecs.ECSDNSName, " with ", outputParams[3].outputValue)
+	if output.ECSDNSName != outputParams[3].outputValue {
+		t.Log("mismatch in output key ", output.ECSDNSName, " with ", outputParams[3].outputValue)
 		t.Fail()
 	}
-	if ecs.ECSLbArn != outputParams[4].outputValue {
-		t.Log("mismatch in output key ", ecs.ECSLbArn, " with ", outputParams[4].outputValue)
+	if output.ECSLbArn != outputParams[4].outputValue {
+		t.Log("mismatch in output key ", output.ECSLbArn, " with ", outputParams[4].outputValue)
 		t.Fail()
 	}
 
@@ -113,9 +113,9 @@ func TestEcsGetClusterGetParametersNoStacks(t *testing.T) {
 
 	ecs := Ecs{Resource: mockGoodResourceNoStacks{}}
 
-	ecs, _ = ecs.GetCluster(stackName)
-	if ecs.ClusterArn != "" {
-		t.Log("no stacks have been returned, ClusterArn should be \"\"", ecs.ClusterArn)
+	output, _ := ecs.GetCluster(stackName)
+	if output.ClusterArn != "" {
+		t.Log("no stacks have been returned, ClusterArn should be \"\"", output.ClusterArn)
 		t.Fail()
 	}
 
@@ -124,7 +124,7 @@ func TestEcsGetClusterFails(t *testing.T) {
 
 	ecs := Ecs{Resource: mockBadResource{}}
 
-	ecs, err := ecs.GetCluster(stackName)
+	_, err := ecs.GetCluster(stackName)
 
 	if err == nil {
 		t.Log("error is nil when it shouldn't be")
@@ -137,11 +137,11 @@ func TestEcsGetClusterFails(t *testing.T) {
 
 }
 func TestEcsCreateCluster(t *testing.T) {
-	clusterStruct := EcsCluster{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
+	clusterStruct := EcsInput{ClusterName: stackName, DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
 
 	ecs := Ecs{Executor: mockGoodExecutor{}}
 
-	err := ecs.CreateCluster(stackName, clusterStruct)
+	err := ecs.CreateCluster(clusterStruct)
 
 	if err != nil {
 		t.Log("error is not nil when it should be ", err.Error())
@@ -152,7 +152,7 @@ func TestEcsCreateCluster(t *testing.T) {
 
 //CreateClusterParameters tests
 func TestCreateClusterParameters(t *testing.T) {
-	clusterStruct := EcsCluster{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
+	clusterStruct := EcsInput{DomainName: "DOMAIN", KeyName: "KEY", VpcID: "VPC", WSSubnetIds: "WSSUBNETS", ClusterSubnetIds: "ClusterSubnetIds", DesiredCapacity: "CAPACITY", MaxSize: "MAXSIZE", InstanceType: "INSTANCETYPE"}
 
 	params := createClusterParameters(clusterStruct)
 	len := len(params)

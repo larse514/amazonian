@@ -46,9 +46,9 @@ func main() {
 	stack := cf.Stack{Client: svc}
 	vpc := network.VPC{Executor: cfExecutor}
 
-	aws := cloud.AWS{Vpc: &vpc, Stack: &stack, Ecs: &ecs, Serv: &serv}
+	aws := cloud.AWS{Vpc: &vpc, Stack: &stack, Ecs: ecs, Serv: &serv}
 
-	err = aws.CreateDeployment(args)
+	err = aws.CreateDeployment(&args)
 
 	if err != nil {
 		fmt.Printf("Error encountered when creating deployment %f", err)

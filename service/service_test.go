@@ -68,9 +68,9 @@ func (m mockBadCreateStackExecutor) PauseUntilFinished(stackName string) error {
 }
 func TestCreateServicePasses(t *testing.T) {
 	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
-	ecs := cluster.Ecs{}
-	service := EcsService{}
-	err := serv.CreateService(&ecs, service, stackName)
+	ecs := cluster.EcsOutput{}
+	service := EcsServiceInput{ServiceName: stackName}
+	err := serv.CreateService(&ecs, &service)
 
 	if err != nil {
 		t.Log("Error returned when both methods returned successfully")
@@ -80,9 +80,9 @@ func TestCreateServicePasses(t *testing.T) {
 }
 func TestCreateServiceCreateStackFails(t *testing.T) {
 	serv := EcsService{Executor: mockBadCreateStackExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
-	ecs := cluster.Ecs{}
-	service := EcsService{}
-	err := serv.CreateService(&ecs, service, stackName)
+	ecs := cluster.EcsOutput{}
+	service := EcsServiceInput{}
+	err := serv.CreateService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")
@@ -92,9 +92,9 @@ func TestCreateServiceCreateStackFails(t *testing.T) {
 }
 func TestCreateServicePriorityFails(t *testing.T) {
 	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockBadLoadBalancer{}}
-	ecs := cluster.Ecs{}
-	service := EcsService{}
-	err := serv.CreateService(&ecs, service, stackName)
+	ecs := cluster.EcsOutput{}
+	service := EcsServiceInput{}
+	err := serv.CreateService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")
@@ -105,9 +105,9 @@ func TestCreateServicePriorityFails(t *testing.T) {
 
 func TestCreateServicePauseFails(t *testing.T) {
 	serv := EcsService{Executor: mockGoodCreateStackFailedPauseExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
-	ecs := cluster.Ecs{}
-	service := EcsService{}
-	err := serv.CreateService(&ecs, service, stackName)
+	ecs := cluster.EcsOutput{}
+	service := EcsServiceInput{}
+	err := serv.CreateService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")

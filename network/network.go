@@ -39,7 +39,7 @@ const (
 //Network is an interface to define operations with which to create
 //cloud provider networks
 type Network interface {
-	CreateNetwork() error
+	CreateNetwork(input *VPCInput) error
 }
 
 //VPC is a struct representing AWS VPC object
@@ -55,6 +55,12 @@ type VPCInput struct {
 	WSSubnets  []Subnet
 	APPSubnets []Subnet
 	DBSubnets  []Subnet
+}
+
+type VPCOutput struct {
+	VPCID       string
+	WSSubnetIDs string
+	CLSubnetIDs string
 }
 
 //Subnet is a struct representing a subnet (not the best description i'll admit)
