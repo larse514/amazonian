@@ -92,9 +92,9 @@ func TestGetStack(t *testing.T) {
 func TestGetStack2StacksReturned(t *testing.T) {
 	stacks := Stack{Client: mockGoodICloudFormationClient2StacksReturned{}}
 	stackName := "STACK"
-	_, err := stacks.GetStack(&stackName)
+	stack, _ := stacks.GetStack(&stackName)
 
-	if err == nil || err.Error() != "Invalid number of stacks" {
+	if *stack.StackName != "" {
 		t.Log("Error not return as it should have for multiple stacks returned")
 		t.Fail()
 	}
@@ -104,9 +104,9 @@ func TestGetStack2StacksReturned(t *testing.T) {
 func TestGetStack0StacksReturned(t *testing.T) {
 	stacks := Stack{Client: mockGoodICloudFormationClient0StacksReturned{}}
 	stackName := "STACK"
-	_, err := stacks.GetStack(&stackName)
+	stack, _ := stacks.GetStack(&stackName)
 
-	if err == nil || err.Error() != "Invalid number of stacks" {
+	if *stack.StackName != "" {
 		t.Log("Error not return as it should have for multiple stacks returned")
 		t.Fail()
 	}

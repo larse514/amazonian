@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation"
@@ -41,12 +42,13 @@ const (
 
 //Service is used to create a generic Container Service
 type Service interface {
-	CreateService(ecs *cluster.EcsOutput, input *EcsServiceInput) error
+	DeployService(ecs *cluster.EcsOutput, input *EcsServiceInput) error
 }
 
 //EcsService is used to create a ECS Container Service
 type EcsService struct {
 	Executor     cf.Executor
+	Resource     cf.Resource
 	LoadBalancer cf.LoadBalancer
 }
 
@@ -67,8 +69,8 @@ type EcsServiceInput struct {
 // 	executor cf.Executor
 // }
 
-//CreateService is a method that creates a service for an ecs service
-func (service EcsService) CreateService(ecs *cluster.EcsOutput, input *EcsServiceInput) error {
+//DeployService is a method that creates a service for an ecs service
+func (service EcsService) DeployService(ecs *cluster.EcsOutput, input *EcsServiceInput) error {
 	//Now grab the priority
 	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
 	if err != nil {
@@ -88,11 +90,25 @@ func (service EcsService) CreateService(ecs *cluster.EcsOutput, input *EcsServic
 		return err
 	}
 
-	//create the stack
-	err = service.Executor.CreateStack(containerTemplate, input.ServiceName, parameters)
+	stack, err := service.Resource.GetStack(&input.ServiceName)
 	if err != nil {
-		println("Error processing create stack request ", err.Error())
-		return err
+		println("error retrieving stack ", err.Error())
+		return errors.New("error retrieving stack " + input.ServiceName)
+	}
+	if *stack.StackName == "" {
+		//create the stack
+		err = service.Executor.CreateStack(containerTemplate, input.ServiceName, parameters)
+		if err != nil {
+			println("Error processing create stack request ", err.Error())
+			return err
+		}
+	} else {
+		//update the stack
+		err = service.Executor.UpdateStack(containerTemplate, input.ServiceName, parameters)
+		if err != nil {
+			println("Error processing create stack request ", err.Error())
+			return err
+		}
 	}
 	//then wait
 	err = service.Executor.PauseUntilFinished(input.ServiceName)

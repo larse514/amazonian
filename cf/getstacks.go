@@ -1,8 +1,6 @@
 package cf
 
 import (
-	"errors"
-
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
 )
@@ -24,14 +22,16 @@ func (stack Stack) GetStack(stackName *string) (cloudformation.Stack, error) {
 	output, err := stack.Client.DescribeStacks(input)
 	if err != nil {
 		println("error: ", err.Error(), " received when trying to find stack: ", *stackName)
-		return cloudformation.Stack{}, err
+		emptyStackName := ""
+		return cloudformation.Stack{StackName: &emptyStackName}, err
 	}
 
 	stackLength := len(output.Stacks)
 
 	if stackLength != 1 {
 		println("invalid number of stacks returned.  Number was: ", stackLength, " should be 1")
-		return cloudformation.Stack{}, errors.New("Invalid number of stacks")
+		emptyStackName := ""
+		return cloudformation.Stack{StackName: &emptyStackName}, err
 	}
 
 	return *output.Stacks[0], nil

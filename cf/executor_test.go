@@ -24,6 +24,13 @@ func (m *mockGoodCloudFormationClient) CreateStack(*cloudformation.CreateStackIn
 	return nil, nil
 }
 
+func (m *mockGoodCloudFormationClient) WaitUntilStackCreateComplete(*cloudformation.DescribeStacksInput) error {
+	return nil
+}
+func (m *mockGoodCloudFormationClient) UpdateStack(*cloudformation.UpdateStackInput) (*cloudformation.UpdateStackOutput, error) {
+	return &cloudformation.UpdateStackOutput{}, nil
+}
+
 // Define a mock to return an error.
 type mockBadCloudFormationClient struct {
 	cloudformationiface.CloudFormationAPI
@@ -32,6 +39,13 @@ type mockBadCloudFormationClient struct {
 func (m *mockBadCloudFormationClient) CreateStack(*cloudformation.CreateStackInput) (*cloudformation.CreateStackOutput, error) {
 	return nil, errors.New("Bad Error")
 }
+func (m *mockBadCloudFormationClient) UpdateStack(*cloudformation.UpdateStackInput) (*cloudformation.UpdateStackOutput, error) {
+	return &cloudformation.UpdateStackOutput{}, errors.New("Bad Error")
+}
+func (m *mockBadCloudFormationClient) WaitUntilStackCreateComplete(*cloudformation.DescribeStacksInput) error {
+	return errors.New("THIS IS AN ERROR")
+}
+
 func TestCloudformationCreateStack(t *testing.T) {
 	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}
 
@@ -53,16 +67,29 @@ func TestCloudformationCreateStackFails(t *testing.T) {
 	}
 
 }
+func TestCloudformationUpdateStack(t *testing.T) {
+	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}
+
+	err := executor.UpdateStack(templateBody, stackName, nil)
+	if err != nil {
+		t.Log("Successful stack request return error ", err.Error())
+		t.Fail()
+	}
+
+}
+
+func TestCloudformationUpdateStackFails(t *testing.T) {
+	executor := CFExecutor{Client: &mockBadCloudFormationClient{}}
+
+	err := executor.UpdateStack(templateBody, stackName, nil)
+	if err == nil {
+		t.Log("Error should have been returned")
+		t.Fail()
+	}
+
+}
 
 //PauseUntilFinished tests, mocks, and methods
-
-func (m *mockGoodCloudFormationClient) WaitUntilStackCreateComplete(*cloudformation.DescribeStacksInput) error {
-	return nil
-}
-
-func (m *mockBadCloudFormationClient) WaitUntilStackCreateComplete(*cloudformation.DescribeStacksInput) error {
-	return errors.New("THIS IS AN ERROR")
-}
 
 func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}

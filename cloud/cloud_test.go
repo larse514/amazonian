@@ -154,7 +154,7 @@ type mockGoodService struct {
 	LoadBalancer cf.LoadBalancer
 }
 
-func (service mockGoodService) CreateService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
+func (service mockGoodService) DeployService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
 	expectedVPC := createVPCOutput().VPCID
 	if input.Vpc != expectedVPC {
 		return errors.New("Invlid VPCID returned.  Expected: " + expectedVPC + " but received: " + input.Vpc)
@@ -167,7 +167,7 @@ type mockBadService struct {
 	LoadBalancer cf.LoadBalancer
 }
 
-func (service mockBadService) CreateService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
+func (service mockBadService) DeployService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
 	return errors.New("UNIT TEST ERROR")
 }
 

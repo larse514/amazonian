@@ -139,6 +139,6 @@ func (aws AWS) deployService(vpc *network.VPCOutput, ecs *cluster.EcsOutput, arg
 	serviceStruct.HostedZoneName = args.HostedZoneName
 	serviceStruct.PortMapping = args.PortMapping
 	//attempt to create the service
-	return aws.Serv.CreateService(ecs, &serviceStruct)
+	return aws.Serv.DeployService(ecs, &serviceStruct)
 
 }

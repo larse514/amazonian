@@ -39,6 +39,12 @@ func (m mockGoodExecutor) CreateStack(templateBody string, sName string, paramet
 	}
 	return nil
 }
+func (m mockGoodExecutor) UpdateStack(templateBody string, sName string, parameters []*cloudformation.Parameter) error {
+	if sName != stackName {
+		return errors.New("INVALID STACK NAME")
+	}
+	return nil
+}
 func (m mockGoodExecutor) PauseUntilFinished(stackName string) error {
 	return nil
 }
@@ -49,6 +55,9 @@ type mockGoodCreateStackFailedPauseExecutor struct {
 }
 
 func (m mockGoodCreateStackFailedPauseExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
+	return nil
+}
+func (m mockGoodCreateStackFailedPauseExecutor) UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return nil
 }
 func (m mockGoodCreateStackFailedPauseExecutor) PauseUntilFinished(stackName string) error {
@@ -63,14 +72,25 @@ type mockBadCreateStackExecutor struct {
 func (m mockBadCreateStackExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return errors.New("ERROR")
 }
+func (m mockBadCreateStackExecutor) UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
+	return errors.New("ERROR")
+}
 func (m mockBadCreateStackExecutor) PauseUntilFinished(stackName string) error {
 	return nil
 }
+
+type mockGoodGetStack struct {
+	Client cloudformationiface.CloudFormationAPI
+}
+
+func (m mockGoodGetStack) GetStack(stackName *string) (cloudformation.Stack, error) {
+	return cloudformation.Stack{StackName: stackName}, nil
+}
 func TestCreateServicePasses(t *testing.T) {
-	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
+	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockGoodLoadBalancer{}, Resource: mockGoodGetStack{}}
 	ecs := cluster.EcsOutput{}
 	service := EcsServiceInput{ServiceName: stackName}
-	err := serv.CreateService(&ecs, &service)
+	err := serv.DeployService(&ecs, &service)
 
 	if err != nil {
 		t.Log("Error returned when both methods returned successfully")
@@ -79,10 +99,10 @@ func TestCreateServicePasses(t *testing.T) {
 
 }
 func TestCreateServiceCreateStackFails(t *testing.T) {
-	serv := EcsService{Executor: mockBadCreateStackExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
+	serv := EcsService{Executor: mockBadCreateStackExecutor{}, LoadBalancer: mockGoodLoadBalancer{}, Resource: mockGoodGetStack{}}
 	ecs := cluster.EcsOutput{}
 	service := EcsServiceInput{}
-	err := serv.CreateService(&ecs, &service)
+	err := serv.DeployService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")
@@ -91,10 +111,10 @@ func TestCreateServiceCreateStackFails(t *testing.T) {
 
 }
 func TestCreateServicePriorityFails(t *testing.T) {
-	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockBadLoadBalancer{}}
+	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockBadLoadBalancer{}, Resource: mockGoodGetStack{}}
 	ecs := cluster.EcsOutput{}
 	service := EcsServiceInput{}
-	err := serv.CreateService(&ecs, &service)
+	err := serv.DeployService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")
@@ -104,10 +124,10 @@ func TestCreateServicePriorityFails(t *testing.T) {
 }
 
 func TestCreateServicePauseFails(t *testing.T) {
-	serv := EcsService{Executor: mockGoodCreateStackFailedPauseExecutor{}, LoadBalancer: mockGoodLoadBalancer{}}
+	serv := EcsService{Executor: mockGoodCreateStackFailedPauseExecutor{}, LoadBalancer: mockGoodLoadBalancer{}, Resource: mockGoodGetStack{}}
 	ecs := cluster.EcsOutput{}
 	service := EcsServiceInput{}
-	err := serv.CreateService(&ecs, &service)
+	err := serv.DeployService(&ecs, &service)
 
 	if err == nil {
 		t.Log("Error not returned")
@@ -115,3 +135,16 @@ func TestCreateServicePauseFails(t *testing.T) {
 	}
 
 }
+
+// func TestUpdateServicePasses(t *testing.T) {
+// 	serv := EcsService{Executor: mockGoodExecutor{}, LoadBalancer: mockGoodLoadBalancer{}, Resource: mockGoodGetStack{}}
+// 	ecs := cluster.EcsOutput{}
+// 	service := EcsServiceInput{ServiceName: stackName}
+// 	err := serv.DeployService(&ecs, &service)
+
+// 	if err != nil {
+// 		t.Log("Error returned when both methods returned successfully")
+// 		t.Fail()
+// 	}
+
+// }

@@ -18,12 +18,35 @@ const (
 //Executor is an interface to execute and create stacks
 type Executor interface {
 	CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
+	UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
+
 	PauseUntilFinished(stackName string) error
 }
 
 //CFExecutor struct used to create cloudformation stacks
 type CFExecutor struct {
 	Client cloudformationiface.CloudFormationAPI
+}
+
+//UpdateStack is a method to update Cloudformation stack
+func (executor CFExecutor) UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
+	//generate cloudformation CreateStackInput to be used to create stack
+	input := &cloudformation.UpdateStackInput{}
+
+	input.SetTemplateBody(*aws.String(templateBody))
+	input.SetStackName(*aws.String(stackName))
+	input.SetParameters(parameters)
+	input.SetCapabilities(createCapability())
+	input.SetTags(createTags())
+	//todo-refactor to return output
+	_, err := executor.Client.UpdateStack(input)
+	//if there's an error return it
+	if err != nil {
+		fmt.Println("Got error creating stack: ", err.Error())
+		return errors.New("Error creating stack")
+
+	}
+	return nil
 }
 
 //CreateStack is a general method to create aws cloudformation stacks
