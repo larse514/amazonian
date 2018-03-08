@@ -19,7 +19,7 @@ aws cloudformation delete-stack --stack-name "${ServiceName}"
 
 CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
-./workdir/amazonian --VPCId=${VPCId} --VpcExists=true --HostedZoneName=vssdevelopment.com \
+./workdir/amazonian --VPCName=${VPCName} --VpcExists=true --HostedZoneName=vssdevelopment.com \
 --Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
 --ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
 
@@ -27,7 +27,7 @@ curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
 # echo | Cleaning up ${CONTAINER_NAME} and ${CLUSTER_NAME} |
 CONTAINER_NAME2=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
-./workdir/amazonian --VPCId=${VPCId} --VpcExists=true --HostedZoneName=vssdevelopment.com \
+./workdir/amazonian --VPCName=${VPCName} --VpcExists=true --HostedZoneName=vssdevelopment.com \
 --Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
 --ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
 
