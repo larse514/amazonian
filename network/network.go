@@ -57,6 +57,7 @@ type VPCInput struct {
 	DBSubnets  []Subnet
 }
 
+//VPCOutput is a struct representing structure of VPC Output params
 type VPCOutput struct {
 	VPCID       string
 	WSSubnetIDs string
@@ -81,7 +82,7 @@ func (vpc VPC) CreateNetwork(input *VPCInput) error {
 		fmt.Println("Error creating vpc stack ", err.Error())
 		return errors.New("Error creating vpc")
 	}
-	return vpc.Executor.PauseUntilFinished(input.Name)
+	return vpc.Executor.PauseUntilCreateFinished(input.Name)
 }
 
 //CreateClusterParameters will create the Parameter list to generate an ecs cluster

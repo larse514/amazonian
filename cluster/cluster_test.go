@@ -36,7 +36,7 @@ type mockGoodExecutor struct {
 func (executor mockGoodExecutor) CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return nil
 }
-func (executor mockGoodExecutor) PauseUntilFinished(stackName string) error {
+func (executor mockGoodExecutor) PauseUntilCreateFinished(stackName string) error {
 	return nil
 }
 func (m mockGoodResource) GetStack(stackName *string) (cloudformation.Stack, error) {

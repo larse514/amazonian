@@ -45,7 +45,10 @@ func (m mockGoodExecutor) UpdateStack(templateBody string, sName string, paramet
 	}
 	return nil
 }
-func (m mockGoodExecutor) PauseUntilFinished(stackName string) error {
+func (m mockGoodExecutor) PauseUntilCreateFinished(stackName string) error {
+	return nil
+}
+func (m mockGoodExecutor) PauseUntilUpdateFinished(stackName string) error {
 	return nil
 }
 
@@ -60,7 +63,10 @@ func (m mockGoodCreateStackFailedPauseExecutor) CreateStack(templateBody string,
 func (m mockGoodCreateStackFailedPauseExecutor) UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return nil
 }
-func (m mockGoodCreateStackFailedPauseExecutor) PauseUntilFinished(stackName string) error {
+func (m mockGoodCreateStackFailedPauseExecutor) PauseUntilCreateFinished(stackName string) error {
+	return errors.New("ERROR")
+}
+func (m mockGoodCreateStackFailedPauseExecutor) PauseUntilUpdateFinished(stackName string) error {
 	return errors.New("ERROR")
 }
 
@@ -75,7 +81,10 @@ func (m mockBadCreateStackExecutor) CreateStack(templateBody string, stackName s
 func (m mockBadCreateStackExecutor) UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error {
 	return errors.New("ERROR")
 }
-func (m mockBadCreateStackExecutor) PauseUntilFinished(stackName string) error {
+func (m mockBadCreateStackExecutor) PauseUntilCreateFinished(stackName string) error {
+	return nil
+}
+func (m mockBadCreateStackExecutor) PauseUntilUpdateFinished(stackName string) error {
 	return nil
 }
 

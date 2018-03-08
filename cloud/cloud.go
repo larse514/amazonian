@@ -46,7 +46,7 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
-		fmt.Printf("Cluster doesn't exist, creating %s...", args.ClusterName)
+		fmt.Printf("Cluster doesn't exist, creating %s...\n", args.ClusterName)
 
 		//create aws ECS cluster
 		err = aws.createCluster(&output, args)
@@ -63,7 +63,7 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		fmt.Printf("error retrieving stack %s", args.ClusterName)
 		return errors.New("error retrieving stack " + args.ClusterName)
 	}
-	fmt.Printf("Creating service %s ...", args.ServiceName)
+	fmt.Printf("Creating service %s ...\n", args.ServiceName)
 
 	err = aws.deployService(&output, &ecs, args)
 	if err != nil {

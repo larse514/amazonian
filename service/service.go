@@ -102,6 +102,12 @@ func (service EcsService) DeployService(ecs *cluster.EcsOutput, input *EcsServic
 			println("Error processing create stack request ", err.Error())
 			return err
 		}
+		//then wait
+		err = service.Executor.PauseUntilCreateFinished(input.ServiceName)
+		if err != nil {
+			println("Error while attempting to wait for stack to finish processing ", err.Error())
+			return err
+		}
 	} else {
 		//update the stack
 		err = service.Executor.UpdateStack(containerTemplate, input.ServiceName, parameters)
@@ -109,13 +115,14 @@ func (service EcsService) DeployService(ecs *cluster.EcsOutput, input *EcsServic
 			println("Error processing create stack request ", err.Error())
 			return err
 		}
+		//then wait
+		err = service.Executor.PauseUntilUpdateFinished(input.ServiceName)
+		if err != nil {
+			println("Error while attempting to wait for stack to finish processing ", err.Error())
+			return err
+		}
 	}
-	//then wait
-	err = service.Executor.PauseUntilFinished(input.ServiceName)
-	if err != nil {
-		println("Error while attempting to wait for stack to finish processing ", err.Error())
-		return err
-	}
+
 	return nil
 }
 

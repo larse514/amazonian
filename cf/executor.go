@@ -20,7 +20,8 @@ type Executor interface {
 	CreateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
 	UpdateStack(templateBody string, stackName string, parameters []*cloudformation.Parameter) error
 
-	PauseUntilFinished(stackName string) error
+	PauseUntilCreateFinished(stackName string) error
+	PauseUntilUpdateFinished(stackName string) error
 }
 
 //CFExecutor struct used to create cloudformation stacks
@@ -71,8 +72,8 @@ func (executor CFExecutor) CreateStack(templateBody string, stackName string, pa
 
 }
 
-//PauseUntilFinished is a method to wait on the status of a cloudformation stack until it finishes
-func (executor CFExecutor) PauseUntilFinished(stackName string) error {
+//PauseUntilCreateFinished is a method to wait on the status of a cloudformation stack until it finishes
+func (executor CFExecutor) PauseUntilCreateFinished(stackName string) error {
 	fmt.Println("Waiting for stack to be created")
 
 	// Wait until stack is created
@@ -80,6 +81,20 @@ func (executor CFExecutor) PauseUntilFinished(stackName string) error {
 	err := executor.Client.WaitUntilStackCreateComplete(desInput)
 	if err != nil {
 		fmt.Println("Got error waiting for stack to be created")
+		fmt.Println(err)
+	}
+	return err
+}
+
+//PauseUntilUpdateFinished is a method to wait on the status of a cloudformation stack until it finishes
+func (executor CFExecutor) PauseUntilUpdateFinished(stackName string) error {
+	fmt.Println("Waiting for stack to be updated")
+
+	// Wait until stack is created
+	desInput := &cloudformation.DescribeStacksInput{StackName: aws.String(stackName)}
+	err := executor.Client.WaitUntilStackUpdateComplete(desInput)
+	if err != nil {
+		fmt.Println("Got error waiting for stack to be updated")
 		fmt.Println(err)
 	}
 	return err

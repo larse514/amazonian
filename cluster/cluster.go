@@ -127,7 +127,7 @@ func (ecs Ecs) CreateCluster(cluster EcsInput) error {
 		return err
 	}
 	//then wait
-	err = ecs.Executor.PauseUntilFinished(cluster.ClusterName)
+	err = ecs.Executor.PauseUntilCreateFinished(cluster.ClusterName)
 
 	if err != nil {
 		println("Error while attempting to wait for stack to finish processing ", err.Error())

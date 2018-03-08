@@ -89,12 +89,12 @@ func TestCloudformationUpdateStackFails(t *testing.T) {
 
 }
 
-//PauseUntilFinished tests, mocks, and methods
+//PauseUntilCreateFinished tests, mocks, and methods
 
 func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 	executor := CFExecutor{Client: &mockGoodCloudFormationClient{}}
 
-	err := executor.PauseUntilFinished(stackName)
+	err := executor.PauseUntilCreateFinished(stackName)
 	if err != nil {
 		t.Log("Successful stack request return error")
 		t.Fail()
@@ -104,7 +104,7 @@ func TestCloudformationWaitUntilStackCreateComplete(t *testing.T) {
 func TestCloudformationWaitUntilStackCreateCompleteFails(t *testing.T) {
 	executor := CFExecutor{Client: &mockBadCloudFormationClient{}}
 
-	err := executor.PauseUntilFinished(stackName)
+	err := executor.PauseUntilCreateFinished(stackName)
 	if err == nil {
 		t.Log("Error should have been returned")
 		t.Fail()
