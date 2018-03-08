@@ -1,4 +1,4 @@
-# amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian)
+# amazonian [![CircleCI](https://circleci.com/gh/larse514/amazonian.svg?style=svg)](https://circleci.com/gh/larse514/amazonian) [![Go Report Card](https://goreportcard.com/badge/github.com/larse514/amazonian)](https://goreportcard.com/report/github.com/larse514/amazonian)
 [Opensource](https://larse514.github.io/amazonian/) tool to faciliate AWS container based application development
 
 ## what does amazonian do?

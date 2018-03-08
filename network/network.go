@@ -87,7 +87,7 @@ func (vpc VPC) CreateNetwork(input *VPCInput) error {
 //CreateClusterParameters will create the Parameter list to generate an ecs cluster
 //todo- unit tests!!!
 func (vpc VPC) createVPCParameters(input *VPCInput) []*cloudformation.Parameter {
-	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
+	//we need to convert this (albeit awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template
 	//todo- refactor this approach

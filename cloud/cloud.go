@@ -12,7 +12,7 @@ import (
 	"github.com/larse514/amazonian/network"
 )
 
-//Cloud is an interface representating actions to take on a Cloud provider
+//Cloud is an interface representing actions to take on a Cloud provider
 type Cloud interface {
 	CreateDeployment(args *commandlineargs.CommandLineArgs)
 }

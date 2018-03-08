@@ -122,7 +122,7 @@ func (service EcsService) DeployService(ecs *cluster.EcsOutput, input *EcsServic
 //CreateServiceParameters will create the Parameter list to generate a cluster service
 //todo- unit tests!!!
 func createServiceParameters(ecs *cluster.EcsOutput, service *EcsServiceInput) []*cloudformation.Parameter {
-	//we need to convert this (albiet awkwardly for the time being) to Cloudformation Parameters
+	//we need to convert this (albeit awkwardly for the time being) to Cloudformation Parameters
 	//we do as such first by converting everything to a key value map
 	//key being the CF Param name, value is the value to provide to the cloudformation template
 	parameterMap := make(map[string]string, 0)
