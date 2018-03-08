@@ -98,7 +98,7 @@ func (client mockGoodCluster) GetParameters() (map[string]string, error) {
 func (client mockGoodCluster) CreateCluster(input cluster.EcsInput) error {
 	args := createCommandLineArgs()
 	output := createVPCOutput()
-	//todo- coudl check all params
+	//todo- could check all params
 	if input.ClusterName != args.ClusterName {
 		return errors.New("invalid ClusterName")
 	}
@@ -138,7 +138,7 @@ func (client mockBadGetCluster) GetParameters() (map[string]string, error) {
 func (client mockBadGetCluster) CreateCluster(input cluster.EcsInput) error {
 	args := createCommandLineArgs()
 	output := createVPCOutput()
-	//todo- coudl check all params
+	//todo- could check all params
 	if input.ClusterName != args.ClusterName {
 		return errors.New("invalid ClusterName")
 	}
@@ -375,7 +375,7 @@ func TestCreateClusterFails(t *testing.T) {
 	err := cloud.createCluster(output, args)
 
 	if err == nil {
-		t.Log("error not returned when it shoudl return UNIT TEST ERROR ")
+		t.Log("error not returned when it should return UNIT TEST ERROR ")
 		t.Fail()
 	}
 
@@ -407,7 +407,7 @@ func TestDeployServiceFails(t *testing.T) {
 	err := cloud.deployService(vpcOutput, output, args)
 
 	if err == nil {
-		t.Log("error not returned when it shoudl return UNIT TEST ERROR ")
+		t.Log("error not returned when it should return UNIT TEST ERROR ")
 		t.Fail()
 	}
 

@@ -23,7 +23,7 @@ func (stack Stack) GetStack(stackName *string) (cloudformation.Stack, error) {
 	if err != nil {
 		println("error: ", err.Error(), " received when trying to find stack: ", *stackName)
 		emptyStackName := ""
-		return cloudformation.Stack{StackName: &emptyStackName}, err
+		return cloudformation.Stack{StackName: &emptyStackName}, nil
 	}
 
 	stackLength := len(output.Stacks)
