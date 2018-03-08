@@ -58,7 +58,6 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 	}
 	//now get the cluster based on the stack name provided
 	ecs, err := aws.Ecs.GetCluster(args.ClusterName)
-	fmt.Printf("ecs cluster returned %+v\n", ecs)
 
 	if err != nil {
 		fmt.Printf("error retrieving stack %s", args.ClusterName)

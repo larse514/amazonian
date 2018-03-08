@@ -122,7 +122,7 @@ func createArgs() CommandLineArgs {
 		MaxSize:          *maxSizePrt,
 		InstanceType:     *instanceTypePrt,
 		PortMapping:      *portMappingPtr,
-		Tenant:           createRandomString(tenant),
+		Tenant:           *vpcNamePrt,
 	}
 	return args
 }
