@@ -41,10 +41,10 @@ func main() {
 
 	//Initialize the dependencies
 	cfExecutor := cf.CFExecutor{Client: svc}
-	serv := service.EcsService{Executor: cfExecutor, LoadBalancer: cf.AWSElb{Client: elb}}
 	ecs := cluster.Ecs{Resource: cf.Stack{Client: svc}, Executor: cfExecutor}
 	stack := cf.Stack{Client: svc}
 	vpc := network.VPC{Executor: cfExecutor}
+	serv := service.EcsService{Executor: cfExecutor, LoadBalancer: cf.AWSElb{Client: elb}, Resource: stack}
 
 	aws := cloud.AWS{Vpc: &vpc, Stack: &stack, Ecs: ecs, Serv: &serv}
 
