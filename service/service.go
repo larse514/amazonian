@@ -16,7 +16,7 @@ const (
 	eLBHostedZoneIDParam = "ecslbhostedzoneid"
 	eLBDNSNameParam      = "ecslbdnsname"
 	eLBARNParam          = "ecslbarn"
-	clusterARNParam      = "EcsInput"
+	clusterARNParam      = "ecscluster"
 	aLBListenerARNParam  = "alblistener"
 	ecsLBFullNameParam   = "ecslbfullname"
 	ecsClusterParam      = "ecscluster"

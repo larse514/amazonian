@@ -1,6 +1,7 @@
 package cloud
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/larse514/amazonian/cluster"
@@ -33,7 +34,7 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		err := aws.createVPC(args)
 
 		if err != nil {
-			return err
+			return errors.New("Failed to create VPC")
 		}
 	}
 
@@ -42,20 +43,16 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		fmt.Printf("Cluster doesn't exist, creating %s...", args.ClusterName)
 
 		//grab the VPC outputs we need to hook into our cluster
-		//todo-do I mirror the getCluster operation and output a struct rather than a bunch of strings?
-		//it might make sense since these are specific string, not the same thing.  That is to say
-		//order is important, therefore they should be treated differently..okay i talked myself into
-		//it, adding as refactor in backlog
 		output, err := aws.getVPC(&args.VPCName, &args.Tenant)
 
 		if err != nil {
-			return err
+			return errors.New("Error retrieving vpc " + args.VPCName)
 
 		}
 		//create aws ECS cluster
 		err = aws.createCluster(&output, args)
 		if err != nil {
-			return err
+			return errors.New("Error creating cluster " + args.ClusterName)
 
 		}
 
@@ -65,11 +62,15 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 
 	if err != nil {
 		fmt.Printf("error retrieving stack %s", args.ClusterName)
-		return err
+		return errors.New("error retrieving stack " + args.ClusterName)
 	}
 	fmt.Printf("Creating service %s ...", args.ServiceName)
 
-	return aws.deployService(&ecs, args)
+	err = aws.deployService(&ecs, args)
+	if err != nil {
+		return errors.New("error deploying service " + args.ServiceName)
+	}
+	return nil
 }
 
 //createVPC is a private method used to create an AWS VPC based on passed in argument
