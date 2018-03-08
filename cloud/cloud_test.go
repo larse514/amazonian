@@ -155,6 +155,10 @@ type mockGoodService struct {
 }
 
 func (service mockGoodService) CreateService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
+	expectedVPC := createVPCOutput().VPCID
+	if input.Vpc != expectedVPC {
+		return errors.New("Invlid VPCID returned.  Expected: " + expectedVPC + " but received: " + input.Vpc)
+	}
 	return nil
 }
 
@@ -386,7 +390,8 @@ func TestDeployService(t *testing.T) {
 	cloud := AWS{Serv: mockGoodService{}}
 	args := createCommandLineArgs()
 	output := createECSServiceOutput()
-	err := cloud.deployService(output, args)
+	vpcOutput := createVPCOutput()
+	err := cloud.deployService(vpcOutput, output, args)
 
 	if err != nil {
 		t.Log("error returned ", err.Error())
@@ -398,7 +403,8 @@ func TestDeployServiceFails(t *testing.T) {
 	cloud := AWS{Serv: mockBadService{}}
 	args := createCommandLineArgs()
 	output := createECSServiceOutput()
-	err := cloud.deployService(output, args)
+	vpcOutput := createVPCOutput()
+	err := cloud.deployService(vpcOutput, output, args)
 
 	if err == nil {
 		t.Log("error not returned when it shoudl return UNIT TEST ERROR ")

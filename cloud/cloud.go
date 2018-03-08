@@ -38,17 +38,16 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 		}
 	}
 
+	//grab the VPC outputs we need to hook into our cluster and deployment
+	output, err := aws.getVPC(&args.VPCName, &args.Tenant)
+	if err != nil {
+		return errors.New("Error retrieving vpc " + args.VPCName)
+
+	}
 	//check if the cluster exists, if not create it
 	if !args.ClusterExists {
 		fmt.Printf("Cluster doesn't exist, creating %s...", args.ClusterName)
 
-		//grab the VPC outputs we need to hook into our cluster
-		output, err := aws.getVPC(&args.VPCName, &args.Tenant)
-
-		if err != nil {
-			return errors.New("Error retrieving vpc " + args.VPCName)
-
-		}
 		//create aws ECS cluster
 		err = aws.createCluster(&output, args)
 		if err != nil {
@@ -66,7 +65,7 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 	}
 	fmt.Printf("Creating service %s ...", args.ServiceName)
 
-	err = aws.deployService(&ecs, args)
+	err = aws.deployService(&output, &ecs, args)
 	if err != nil {
 		return errors.New("error deploying service " + args.ServiceName)
 	}
@@ -129,11 +128,11 @@ func (aws AWS) createCluster(output *network.VPCOutput, args *commandlineargs.Co
 }
 
 //deployService is a private method to deploy an AWS ECS Service
-func (aws AWS) deployService(ecs *cluster.EcsOutput, args *commandlineargs.CommandLineArgs) error {
+func (aws AWS) deployService(vpc *network.VPCOutput, ecs *cluster.EcsOutput, args *commandlineargs.CommandLineArgs) error {
 	//create the service struct, this is the struct that defines everything we need to create a container service
 	//(note that for the time being only ECS is supported)
 	serviceStruct := service.EcsServiceInput{}
-	serviceStruct.Vpc = args.VPC
+	serviceStruct.Vpc = vpc.VPCID
 	serviceStruct.Image = args.Image
 	serviceStruct.ServiceName = args.ServiceName
 	serviceStruct.ContainerName = args.ContainerName

@@ -41,8 +41,7 @@ Amazonian uses [AWS ACM](https://docs.aws.amazon.com/acm/latest/userguide/acm-ov
 <br />
 
 ### Secure by Default Network Topology
-By default AWS relies on private 
-
+Amazonian uses 
 ## running amazonian
 
 Once the amazonian binary is installed, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target is to facilitate CI/CD pipelines
