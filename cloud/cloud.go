@@ -56,7 +56,6 @@ func (aws AWS) retrieveOrCreateVPC(args *commandlineargs.CommandLineArgs) (netwo
 	//attempt to fetch the VPC by it's name
 	vpcStack, err := aws.getVPC(&args.VPCName, &args.Tenant)
 	//if stack name is the empty string then assume stack doesn't exist so create it
-	fmt.Printf("vpc is %s\n", vpcStack)
 
 	if vpcStack.VPCID == "" {
 		fmt.Printf("VPC %s doesn't exist, creating...\n", args.VPCName)

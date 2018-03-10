@@ -56,8 +56,32 @@ Amazonian leverages the AWS SDKs in order to build the necessary infrastructure 
 [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
 
 Amazonian itself requires the following minimum permissions to execute:
-TO BE ADDED
 
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1520651333659",
+      "Action": [
+        "cloudformation:CreateStack",
+        "cloudformation:DescribeStacks",
+        "cloudformation:UpdateStack"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Stmt1520651471837",
+      "Action": [
+        "elasticloadbalancing:DeleteRule"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+```
 **Step 2: _Route 53 Hosted Zone_** <br />
 In order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Rather than create a unique load balancer, each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the desired service.
 
@@ -66,25 +90,26 @@ The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](h
 ### parameters
 The following describes the parameters you can use to customize amazonian deployments.
 
-| Paramater      | Description                                                            | Required | Default   | Note                                                    |
-|----------------|------------------------------------------------------------------------|----------|-----------|---------------------------------------------------------|
-| VPC            | Target VPC to deploy your containers                                   | Yes      | None      |                                                         |
-| Priority       | Priority to use for Load Balancer Listener rules                       | Yes      | None      | This will be removed soon for a dynamic lookup          |
-| HostedZoneName | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None      |                                                         |
-| Image          | Docker Repository Image to be deployed as a container                  | Yes      | None      |                                                         |
-| ServiceName    | Name of container service to be deployed                               | Yes      | None      |                                                         |
-| ContainerName  | Name of container to be deployed                                       | Yes      | None      |                                                         |
-| ClusterName    | Name of ECS Cluster to use                                             | Yes      | None      | This will be expanded to include Fargate and Kubernetes |
-| ClusterExists  | Specify whether to use an existing cluster                             | No       | false     |                                                         |
-| Subnets        | List of VPC Subnets to deploy cluster to.                              | Sometimes       |           | Required if ClusterExists is false                      |
-| KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       |           |                                                         |
-| ClusterSize    | Number of host machines for cluster.                                   | No       | 1         |                                                         |
-| MaxSize        | Max number of host machines cluster can scale to                       | No       | 1         |                                                         |
-| InstanceType   | Type of EC2 machine                                                    | No       | t2.medium | Required if ClusterExists is false                      |
-
+| Paramater      | Description                                                            | Required | Default     | Note                                                    |
+|----------------|------------------------------------------------------------------------|----------|-------------|---------------------------------------------------------|
+| VPCId          | Target VPC to deploy your containers                                   | No      | None        |                                                         |
+| PortMapping          | Exposed container port                                  | Yes      | None        |                                                         |
+| VPCName        | Name of VPC to have amazonian use or create                            | No       | Random Name |                                                         |
+| HostedZoneName | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None        |                                                         |
+| Image          | Docker Repository Image to be deployed as a container                  | Yes      | None        |                                                         |
+| ServiceName    | Name of container service to be deployed                               | No      | Random Name        |                                                         |
+| ContainerName  | Name of container to be deployed                                       | No      | Random Name        |                                                         |
+| ClusterName    | Name ECS Cluster to use                                                | No      | Random Name        | This will be expanded to include Fargate and Kubernetes |
+| ClusterSubnets | List of VPC Subnets to deploy cluster to                               | No       | None        | Required if cluster and vpc exists                      |
+| ELBSubnets     | List of VPC Subnets to deploy Load Balancers to                        | No       | None        | Required if cluster and vpc exists                      |
+| KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       | None        |                                                         |
+| ClusterSize    | Number of host machines for cluster.                                   | No       | 1           | Required if ClusterExists is false                                                        |
+| MaxSize        | Max number of host machines cluster can scale to                       | No       | 1           | Required if ClusterExists is false                                                        |
+| InstanceType   | Type of EC2 machine                                                    | No       | t2.medium   | Required if ClusterExists is false                      |
+|                |                                                                        |          |             |                                                         |
 An example command of how you might run amazonian can be seen below:
 
-`./amazonian --VPC=vpc-c7aa77be --Priority=12 --HostedZoneName=vssdevelopment.com --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Node --ContainerName=Hello --ClusterName=amazonian-ecs-dev --ClusterExists=false --Subnets=subnet-b61d81fe,subnet-0202dc58 --KeyName=dummy_key1 ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium`
+`./amazonian --VPCName=amazonian-dev --HostedZoneName=<hostedzonename>.com --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --ClusterName=amazonian-ecs-dev ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium --PortMapping=8080`
 
 
 ## installation
