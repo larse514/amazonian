@@ -103,6 +103,7 @@ func (aws AWS) retrieveOrCreateCluster(output *network.VPCOutput, args *commandl
 	ecsOuput, err := aws.Ecs.GetCluster(args.ClusterName)
 
 	if ecsOuput.ClusterArn == "" {
+		fmt.Printf("cluster %s does not exist, creating...\n", args.ClusterName)
 		//create cluster
 		ecsInput := cluster.EcsInput{}
 		ecsInput.DomainName = args.HostedZoneName
