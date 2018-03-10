@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    branches:
+      only:
+        - master
     working_directory: /go/src/github.com/larse514/amazonian
     docker:
       - image: larse514/circleci-golang:latest
