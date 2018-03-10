@@ -83,7 +83,7 @@ Amazonian itself requires the following minimum permissions to execute:
 }
 ```
 **Step 2: _Route 53 Hosted Zone_** <br />
-In order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Rather than create a unique load balancer, each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the desired service.
+In order to reduce cost and increase flexibility, ecs uses DNS routing to route HTTP calls to the correct container service.  Rather than create a unique load balancer, each service will create a [RecordSetGroup](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordsetgroup.html) and an [ALB Routing Rule](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html) to direct the HTTP request to the desired service.  An AWS Route 53 [HostedZone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html) is required to create the necessary RecordSetGroup
 
 **Step 3: _Docker Repository_** <br />
 The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](https://aws.amazon.com/ecr/) or [DockerHub](https://hub.docker.com/) are both great options.
@@ -93,8 +93,8 @@ The following describes the parameters you can use to customize amazonian deploy
 | Paramater      | Description                                                            | Required | Default     | Note                                                    |
 |----------------|------------------------------------------------------------------------|----------|-------------|---------------------------------------------------------|
 | VPCId          | Target VPC to deploy your containers                                   | No      | None        |                                                         |
-| PortMapping          | Exposed container port                                  | Yes      | None        |                                                         |
 | VPCName        | Name of VPC to have amazonian use or create                            | No       | Random Name |                                                         |
+| PortMapping          | Exposed container port                                  | Yes      | None        |                                                         
 | HostedZoneName | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None        |                                                         |
 | Image          | Docker Repository Image to be deployed as a container                  | Yes      | None        |                                                         |
 | ServiceName    | Name of container service to be deployed                               | No      | Random Name        |                                                         |
