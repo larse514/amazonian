@@ -83,7 +83,7 @@ func (ecs Ecs) GetCluster(stackName string) (EcsOutput, error) {
 
 	if err != nil {
 		println("error retrieving stack ", err.Error())
-		return EcsOutput{}, err
+		return EcsOutput{ClusterArn: ""}, nil
 	}
 
 	outputMap := getOutputParameters(&stack)

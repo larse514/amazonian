@@ -124,14 +124,22 @@ func TestEcsGetClusterFails(t *testing.T) {
 
 	ecs := Ecs{Resource: mockBadResource{}}
 
-	_, err := ecs.GetCluster(stackName)
+	output, _ := ecs.GetCluster(stackName)
 
-	if err == nil {
-		t.Log("error is nil when it shouldn't be")
+	if output.ClusterArn != "" {
+		t.Log("ClusterARN not equal to emptry string")
 		t.Fail()
 	}
-	if err.Error() != "THIS IS AN ERROR" {
-		t.Log("Error message: ", err.Error(), " is invalid")
+
+}
+func TestEcsGetClusterFailsErrorNil(t *testing.T) {
+
+	ecs := Ecs{Resource: mockBadResource{}}
+
+	_, err := ecs.GetCluster(stackName)
+
+	if err != nil {
+		t.Log("Error not nil")
 		t.Fail()
 	}
 

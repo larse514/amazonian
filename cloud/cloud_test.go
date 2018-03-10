@@ -72,6 +72,7 @@ func (stack mockGoodStack) GetStack(stackName *string) (cloudformation.Stack, er
 	outputs = append(outputs, &outputWs3)
 
 	cfStack.SetOutputs(outputs)
+	cfStack.SetStackName(*stackName)
 
 	return cfStack, nil
 }
@@ -82,6 +83,24 @@ type mockBadStack struct {
 
 func (stack mockBadStack) GetStack(stackName *string) (cloudformation.Stack, error) {
 	return cloudformation.Stack{}, errors.New("STACK ERROR")
+}
+
+type mockEmptyStringStack struct {
+	cf.Resource
+}
+
+func (stack mockEmptyStringStack) GetStack(stackName *string) (cloudformation.Stack, error) {
+	emptyString := ""
+	return cloudformation.Stack{StackName: &emptyString}, nil
+}
+
+type mockEmptyStackName struct {
+	cf.Resource
+}
+
+func (stack mockEmptyStackName) GetStack(stackName *string) (cloudformation.Stack, error) {
+	emptyStack := ""
+	return cloudformation.Stack{StackName: &emptyStack}, nil
 }
 
 type mockGoodCluster struct {
@@ -197,8 +216,6 @@ func TestCreateDeployment(t *testing.T) {
 
 	args := createCommandLineArgs()
 	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
 	err := cloud.CreateDeployment(args)
 
 	if err != nil {
@@ -208,211 +225,49 @@ func TestCreateDeployment(t *testing.T) {
 
 }
 func TestCreateDeploymentVPCFails(t *testing.T) {
-	cloud := AWS{Vpc: mockBadVPC{}, Stack: mockGoodStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
-	expectedError := "Failed to create VPC"
+	cloud := AWS{Vpc: mockBadVPC{}, Stack: mockEmptyStringStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
+	expectedError := "error retrieving or creating vpc"
 
 	args := createCommandLineArgs()
 	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
 	err := cloud.CreateDeployment(args)
 
-	if err.Error() != expectedError {
-		t.Log("Error returned ", err.Error(), " expected ", expectedError)
+	if err == nil {
+		t.Log("Error not returned")
 		t.Fail()
+
+	} else {
+		if err.Error() != expectedError {
+			t.Log("Error returned ", err.Error(), " expected ", expectedError)
+			t.Fail()
+		}
 	}
 
 }
-func TestCreateDeploymentFetchStackFails(t *testing.T) {
-	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockBadStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
-	args := createCommandLineArgs()
-
-	expectedError := "Error retrieving vpc " + args.VPCName
-
-	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
-	err := cloud.CreateDeployment(args)
-
-	if err.Error() != expectedError {
-		t.Log("Error returned ", err.Error(), " expected ", expectedError)
-		t.Fail()
-	}
-
-}
-func TestCreateDeploymentCreateClusterFails(t *testing.T) {
+func TestCreateDeploymentClusterFails(t *testing.T) {
 	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockBadCluster{}, Serv: mockGoodService{}}
 	args := createCommandLineArgs()
 
-	expectedError := "Error creating cluster " + args.ClusterName
-
 	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
 	err := cloud.CreateDeployment(args)
 
-	if err.Error() != expectedError {
-		t.Log("Error returned ", err.Error(), " expected ", expectedError)
+	if err != nil {
+		t.Log("Error returned ", err.Error(), " when it shouldn't have")
 		t.Fail()
 	}
 
 }
-func TestCreateDeploymentGetClusterFails(t *testing.T) {
-	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockBadGetCluster{}, Serv: mockGoodService{}}
-	args := createCommandLineArgs()
-
-	expectedError := "error retrieving stack " + args.ClusterName
-
-	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
-	err := cloud.CreateDeployment(args)
-
-	if err.Error() != expectedError {
-		t.Log("Error returned ", err.Error(), " expected ", expectedError)
-		t.Fail()
-	}
-
-}
-func TestCreateDeploymentDeployServiceFails(t *testing.T) {
+func TestCreateDeploymentDeployServiceFailss(t *testing.T) {
 	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockGoodCluster{}, Serv: mockBadService{}}
 	args := createCommandLineArgs()
 
-	expectedError := "error deploying service " + args.ServiceName
+	expectedError := "error deploying service"
 
 	args.Tenant = tenant
-	args.VPCExists = false
-	args.ClusterExists = false
 	err := cloud.CreateDeployment(args)
 
 	if err.Error() != expectedError {
 		t.Log("Error returned ", err.Error(), " expected ", expectedError)
-		t.Fail()
-	}
-
-}
-func TestCreateVPC(t *testing.T) {
-	cloud := AWS{Vpc: mockGoodVPC{}}
-
-	err := cloud.createVPC(createCommandLineArgs())
-
-	if err != nil {
-		t.Log("error returned ", err.Error())
-		t.Fail()
-	}
-}
-func TestCreateVPCFails(t *testing.T) {
-	cloud := AWS{Vpc: mockBadVPC{}}
-
-	err := cloud.createVPC(createCommandLineArgs())
-
-	if err == nil {
-		t.Log("error not returned ")
-		t.Fail()
-	}
-	if err.Error() != "ERROR" {
-		t.Log("invalid error message returned expected ERROR got ", err.Error())
-		t.Fail()
-	}
-}
-
-func TestGetVpc(t *testing.T) {
-	cloud := AWS{Stack: mockGoodStack{}}
-	vpcForPtr := vpc
-	tenantForVpc := tenant
-	output, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
-
-	if err != nil {
-		t.Log("retrieved unexepected error ", err.Error())
-		t.Fail()
-	}
-
-	if output.VPCID != vpcOutput {
-		t.Log("invalid vpcId expected ", vpcOutput, " got ", output.VPCID)
-	}
-	if output.WSSubnetIDs != wsSubnetIds {
-		t.Log("invalid wsSubnetIds expected ", wsSubnetIds, " got ", output.WSSubnetIDs)
-		t.Fail()
-
-	}
-	if output.CLSubnetIDs != wsSubnetIds {
-		t.Log("invalid clSubnetIds expected ", wsSubnetIds, " got ", output.CLSubnetIDs)
-		t.Fail()
-	}
-
-}
-
-func TestGetVpcFails(t *testing.T) {
-	cloud := AWS{Stack: mockBadStack{}}
-	vpcForPtr := vpc
-	tenantForVpc := tenant
-	_, err := cloud.getVPC(&vpcForPtr, &tenantForVpc)
-
-	if err == nil {
-		t.Log("no error returned")
-		t.Fail()
-	}
-
-}
-
-func TestCreateCluster(t *testing.T) {
-	cloud := AWS{Ecs: mockGoodCluster{}}
-	args := createCommandLineArgs()
-	output := createVPCOutput()
-	err := cloud.createCluster(output, args)
-
-	if err != nil {
-		t.Log("error returned ", err.Error())
-		t.Fail()
-	}
-
-}
-
-func TestCreateClusterFails(t *testing.T) {
-	cloud := AWS{Ecs: mockBadCluster{}}
-	args := createCommandLineArgs()
-	output := createVPCOutput()
-	err := cloud.createCluster(output, args)
-
-	if err == nil {
-		t.Log("error not returned when it should return UNIT TEST ERROR ")
-		t.Fail()
-	}
-
-	if err.Error() != "UNIT TEST ERROR" {
-		t.Log("Incorrect error returned expected UNIT TEST ERROR but got: ", err.Error())
-		t.Fail()
-	}
-
-}
-
-func TestDeployService(t *testing.T) {
-	cloud := AWS{Serv: mockGoodService{}}
-	args := createCommandLineArgs()
-	output := createECSServiceOutput()
-	vpcOutput := createVPCOutput()
-	err := cloud.deployService(vpcOutput, output, args)
-
-	if err != nil {
-		t.Log("error returned ", err.Error())
-		t.Fail()
-	}
-
-}
-func TestDeployServiceFails(t *testing.T) {
-	cloud := AWS{Serv: mockBadService{}}
-	args := createCommandLineArgs()
-	output := createECSServiceOutput()
-	vpcOutput := createVPCOutput()
-	err := cloud.deployService(vpcOutput, output, args)
-
-	if err == nil {
-		t.Log("error not returned when it should return UNIT TEST ERROR ")
-		t.Fail()
-	}
-
-	if err.Error() != "UNIT TEST ERROR" {
-		t.Log("Incorrect error returned expected UNIT TEST ERROR but got: ", err.Error())
 		t.Fail()
 	}
 

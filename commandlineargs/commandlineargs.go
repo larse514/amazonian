@@ -20,13 +20,11 @@ const (
 type CommandLineArgs struct {
 	VPC              string
 	VPCName          string
-	VPCExists        bool
 	HostedZoneName   string
 	Image            string
 	ServiceName      string
 	ContainerName    string
 	ClusterName      string
-	ClusterExists    bool
 	ClusterSubnetIDs string
 	WSSubnetIDs      string
 	KeyName          string
@@ -87,14 +85,12 @@ func createArgs() CommandLineArgs {
 	vpcNamePrt := flag.String("VPCName", createRandomString(vpc), "VPC Name to deploy target group. (Required if VPCId is not passed)")
 	portMappingPtr := flag.String("PortMapping", "", "Port used by container (Required)")
 
-	vpcExistsPtr := flag.Bool("VpcExists", false, "Specify whether VPC exists or should be created. (Defaults to false)")
 	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
 
 	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
 	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
-	clusterExistsPtr := flag.Bool("ClusterExists", false, "If cluster exists (Defaults to false)")
 	elbSubnetPtr := flag.String("ELBSubnets", "", "List of VPC Subnets to deploy Elastic Load Balancers to (Required only if clusterExists is false)")
 	clusterSubnetsPtr := flag.String("ClusterSubnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
 
@@ -108,13 +104,11 @@ func createArgs() CommandLineArgs {
 	args := CommandLineArgs{
 		VPC:              *vpcPtr,
 		VPCName:          *vpcNamePrt,
-		VPCExists:        *vpcExistsPtr,
 		HostedZoneName:   *hostedZonePtr,
 		Image:            *imagePtr,
 		ServiceName:      *serviceNamePtr,
 		ContainerName:    *containerNamePtr,
 		ClusterName:      *clusterNamePtr,
-		ClusterExists:    *clusterExistsPtr,
 		ClusterSubnetIDs: *clusterSubnetsPtr,
 		WSSubnetIDs:      *elbSubnetPtr,
 		KeyName:          *keyNamePrt,

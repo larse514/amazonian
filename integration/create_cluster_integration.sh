@@ -19,17 +19,21 @@ aws cloudformation delete-stack --stack-name "${ServiceName}"
 
 CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
-./workdir/amazonian --VPCName=${VPCName} --VpcExists=true --HostedZoneName=vssdevelopment.com \
+./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
 --Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
---ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
+--ClusterName=${ClusterName} --PortMapping=8080
+
+# ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
+# --Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
+# --ClusterName=${ClusterName} --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
 # echo | Cleaning up ${CONTAINER_NAME} and ${CLUSTER_NAME} |
 CONTAINER_NAME2=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
-./workdir/amazonian --VPCName=${VPCName} --VpcExists=true --HostedZoneName=vssdevelopment.com \
+./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
 --Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
---ClusterName=${ClusterName} --ClusterExists=true --PortMapping=8080
+--ClusterName=${ClusterName} --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 
@@ -48,4 +52,17 @@ echo "about to delete ${CONTAINER_NAME} ${CONTAINER_NAME2} ${ClusterName} and ${
 aws cloudformation delete-stack --stack-name "${CONTAINER_NAME}"
 aws cloudformation delete-stack --stack-name "${CONTAINER_NAME2}"
 aws cloudformation delete-stack --stack-name "${ClusterName}"
+
+#next, test if we can create a new cluster in the same vpc
+NEW_CLUSTER=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
+
+./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
+--Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
+--ClusterName=${NEW_CLUSTER} --PortMapping=8080
+
+curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
+source amazonian-output
+aws cloudformation delete-stack --stack-name "${CONTAINER_NAME2}"
+aws cloudformation delete-stack --stack-name "${NEW_CLUSTER}"
 aws cloudformation delete-stack --stack-name "${VPCName}"
+

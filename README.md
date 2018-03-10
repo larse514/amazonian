@@ -41,7 +41,8 @@ Amazonian uses [AWS ACM](https://docs.aws.amazon.com/acm/latest/userguide/acm-ov
 <br />
 
 ### Secure by Default Network Topology
-Amazonian uses 
+Amazonian uses [AWS VPC Best Practices](https://docs.aws.amazon.com/quickstart/latest/vpc/architecture.html) to create a secure by default netowork topology.  This means that only the public load balancer is accessible from the internet.  The cluster is secured within a private subnet.  
+
 ## running amazonian
 
 Once the amazonian binary is installed, it can be executed from the command line.  There is currently no UI associated with amazonian as the main target is to facilitate CI/CD pipelines
