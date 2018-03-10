@@ -6,7 +6,7 @@
 The goal of amazonian is to abstract away the complexity of deploying containers in AWS.  You can use your own cluster, or let amazonian create one for you.  Either way, just provide a few configuration values and amazonian will deploy, run, monitor, and secure your containers for you.  It's your infrastructure so there's no cost, other than what is required to run a cluster.
 
 ## how can I use it?
-Through the power of AWS ECS, Fargate, and Docker; amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a working container 
+Through the power of AWS ECS, Fargate (coming soon), and Docker; amazonian strives to keep things simple.  In order to get started there is only one short command that you need to run to deploy a vpc, cluster, and working container
 
 ```bash
 $ ./amazonian --HostedZoneName=<Route 53 Hosted Zone> --Image=<Image Name> --PortMapping=<Container Port>
@@ -41,7 +41,7 @@ Amazonian uses [AWS ACM](https://docs.aws.amazon.com/acm/latest/userguide/acm-ov
 <br />
 
 ### Secure by Default Network Topology
-Amazonian uses [AWS VPC Best Practices](https://docs.aws.amazon.com/quickstart/latest/vpc/architecture.html) to create a secure by default netowork topology.  This means that only the public load balancer is accessible from the internet.  The cluster is secured within a private subnet.  
+Amazonian uses [AWS VPC Best Practices](https://docs.aws.amazon.com/quickstart/latest/vpc/architecture.html) to create a secure by default netowork topology.  This means that only the public load balancer is accessible from the internet.  The cluster itself is secured within a private subnet.  
 
 ## running amazonian
 
@@ -55,7 +55,7 @@ The following steps are required to configure your environment to be able to run
 Amazonian leverages the AWS SDKs in order to build the necessary infrastructure to support your containers.  This requires the environment with which amazonian is executed to be setup with appropriate IAM credentials and AWS configuration.  AWS provides documentation here:
 [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html) <br /> 
 
-Amazonian itself requires the following minimum permissions to execute:
+Amazonian itself requires the following minimum permissions to execute (note this can be refined further for [least priviledge](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege):
 
 ```json
 {
