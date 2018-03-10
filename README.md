@@ -59,27 +59,151 @@ Amazonian itself requires the following minimum permissions to execute:
 
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "Stmt1520651333659",
-      "Action": [
-        "cloudformation:CreateStack",
-        "cloudformation:DescribeStacks",
-        "cloudformation:UpdateStack"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Sid": "Stmt1520651471837",
-      "Action": [
-        "elasticloadbalancing:DeleteRule"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1520651333659",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DescribeStacks",
+                "cloudformation:UpdateStack"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520651471837",
+            "Action": [
+                "elasticloadbalancing:DeleteRule"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520652233156",
+            "Action": "ec2:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520652719751",
+            "Action": "ecs:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520652937134",
+            "Action": "acm:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520653163038",
+            "Action": "elasticloadbalancing:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520653378777",
+            "Action": [
+                "iam:CreateRole"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520653785271",
+            "Action": [
+                "iam:CreateRole",
+                "iam:PutRolePolicy"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520654006105",
+            "Action": "cloudwatch:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520654617594",
+            "Action": [
+                "iam:CreateInstanceProfile",
+                "iam:CreateRole",
+                "iam:PutRolePolicy"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520655055968",
+            "Action": "iam:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520656446477",
+            "Action": "autoscaling:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520656985244",
+            "Action": [
+                "route53:ListHostedZones"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520657614009",
+            "Action": "logs:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520658456941",
+            "Action": [
+                "route53:ChangeResourceRecordSets"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520658924046",
+            "Action": [
+                "route53:GetChange"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520659570830",
+            "Action": [
+                "application-autoscaling:DescribeScalableTargets",
+                "application-autoscaling:RegisterScalableTarget"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520660307988",
+            "Action": [
+                "application-autoscaling:DescribeScalingPolicies"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1520660354923",
+            "Action": [
+                "application-autoscaling:PutScalingPolicy"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
 }
 ```
 **Step 2: _Route 53 Hosted Zone_** <br />
@@ -92,21 +216,22 @@ The following describes the parameters you can use to customize amazonian deploy
 
 | Paramater      | Description                                                            | Required | Default     | Note                                                    |
 |----------------|------------------------------------------------------------------------|----------|-------------|---------------------------------------------------------|
-| VPCId          | Target VPC to deploy your containers                                   | No      | None        |                                                         |
+| VPCId          | Target VPC to deploy your containers                                   | Yes      | None        |                                                         |
 | VPCName        | Name of VPC to have amazonian use or create                            | No       | Random Name |                                                         |
-| PortMapping          | Exposed container port                                  | Yes      | None        |                                                         
+| PortMapping    | Exposed container port                                                 | Yes      | None        |                                                         |
 | HostedZoneName | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None        |                                                         |
 | Image          | Docker Repository Image to be deployed as a container                  | Yes      | None        |                                                         |
-| ServiceName    | Name of container service to be deployed                               | No      | Random Name        |                                                         |
-| ContainerName  | Name of container to be deployed                                       | No      | Random Name        |                                                         |
-| ClusterName    | Name ECS Cluster to use                                                | No      | Random Name        | This will be expanded to include Fargate and Kubernetes |
+| ServiceName    | Name of container service to be deployed                               | No       | Random Name |                                                         |
+| ContainerName  | Name of container to be deployed                                       | No       | Random Name |                                                         |
+| ClusterName    | Name of ECS Cluster to use                                             | No       | Random Name | This will be expanded to include Fargate and Kubernetes |
 | ClusterSubnets | List of VPC Subnets to deploy cluster to                               | No       | None        | Required if cluster and vpc exists                      |
 | ELBSubnets     | List of VPC Subnets to deploy Load Balancers to                        | No       | None        | Required if cluster and vpc exists                      |
 | KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       | None        |                                                         |
-| ClusterSize    | Number of host machines for cluster.                                   | No       | 1           | Required if ClusterExists is false                                                        |
-| MaxSize        | Max number of host machines cluster can scale to                       | No       | 1           | Required if ClusterExists is false                                                        |
-| InstanceType   | Type of EC2 machine                                                    | No       | t2.medium   | Required if ClusterExists is false                      |
+| ClusterSize    | Number of host machines for cluster.                                   | No       | 1           |                                                         |
+| MaxSize        | Max number of host machines cluster can scale to                       | No       | 1           |                                                         |
+| InstanceType   | Type of EC2 machine                                                    | No       | t2.medium   | Required if cluster and vpc exists                      |
 |                |                                                                        |          |             |                                                         |
+
 An example command of how you might run amazonian can be seen below:
 
 `./amazonian --VPCName=amazonian-dev --HostedZoneName=<hostedzonename>.com --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --ClusterName=amazonian-ecs-dev ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium --PortMapping=8080`
