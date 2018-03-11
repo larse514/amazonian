@@ -69,4 +69,8 @@ func TestCreateArgs(t *testing.T) {
 		t.Log("cluster name is invalid ", args.ClusterName)
 		t.Fail()
 	}
+	if args.ServiceName != args.ContainerName {
+		t.Log("ContainerName", args.ContainerName, " not defaulted to ServiceName of ", args.ServiceName)
+		t.Fail()
+	}
 }

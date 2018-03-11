@@ -89,7 +89,7 @@ func createArgs() CommandLineArgs {
 	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
 
 	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
-	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
+	containerNamePtr := flag.String("ContainerName", "", "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
 	elbSubnetPtr := flag.String("ELBSubnets", "", "List of VPC Subnets to deploy Elastic Load Balancers to (Required only if clusterExists is false)")
 	clusterSubnetsPtr := flag.String("ClusterSubnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
@@ -99,7 +99,9 @@ func createArgs() CommandLineArgs {
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 	//parse the values
-
+	if *containerNamePtr == "" {
+		*containerNamePtr = *serviceNamePtr
+	}
 	flag.Parse()
 	args := CommandLineArgs{
 		VPC:              *vpcPtr,
