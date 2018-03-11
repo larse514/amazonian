@@ -18,21 +18,27 @@ const (
 
 //CommandLineArgs is a struct representing items pulled from the command line
 type CommandLineArgs struct {
-	VPC              string
-	VPCName          string
-	HostedZoneName   string
-	Image            string
-	ServiceName      string
-	ContainerName    string
-	ClusterName      string
-	ClusterSubnetIDs string
-	WSSubnetIDs      string
-	KeyName          string
-	ClusterSize      string
-	MaxSize          string
-	InstanceType     string
-	PortMapping      string
-	Tenant           string
+	VPC               string
+	VPCName           string
+	HostedZoneName    string
+	Image             string
+	ServiceName       string
+	ContainerName     string
+	ClusterName       string
+	ClusterSubnetIDs  string
+	WSSubnetIDs       string
+	KeyName           string
+	ClusterSize       string
+	MaxSize           string
+	InstanceType      string
+	PortMapping       string
+	Tenant            string
+	EcsLbHostedZoneID string
+	EcsLBDNSName      string
+	EcsLBARN          string
+	EcsLBFullName     string
+	EcsARN            string
+	EcsLBListenerARN  string
 }
 
 //validateArguments method to validate all required command line args are specified
@@ -81,42 +87,58 @@ func randomString(n int) string {
 
 func createArgs() CommandLineArgs {
 	//todo-refactor flags more for unit testing
-	vpcPtr := flag.String("VPCId", "", "VPC to deploy target group. (Required)")
+	//VPC parameters
+	vpcIDPtr := flag.String("VPCId", "", "VPC to deploy target group. (Required)")
 	vpcNamePrt := flag.String("VPCName", createRandomString(vpc), "VPC Name to deploy target group. (Required if VPCId is not passed)")
-	portMappingPtr := flag.String("PortMapping", "", "Port used by container (Required)")
-
-	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
-	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
-
-	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
-	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
 	clusterNamePtr := flag.String("ClusterName", createRandomString(cluster), "Name ECS Cluster to use (Required)")
 	elbSubnetPtr := flag.String("ELBSubnets", "", "List of VPC Subnets to deploy Elastic Load Balancers to (Required only if clusterExists is false)")
+	hostedZonePtr := flag.String("HostedZoneName", "", "HostedZoneName used to create dns entry for services. (Required)")
+
+	imagePtr := flag.String("Image", "", "Docker Repository Image (Required)")
+
+	//service definitions
+	serviceNamePtr := flag.String("ServiceName", createRandomString(service), "Name ECS Service Name (Required)")
+	containerNamePtr := flag.String("ContainerName", createRandomString(container), "Name ECS Container Name (Required)")
+	portMappingPtr := flag.String("PortMapping", "", "Port used by container (Required)")
+
 	clusterSubnetsPtr := flag.String("ClusterSubnets", "", "List of VPC Subnets to deploy cluster to (Required only if clusterExists is false)")
 
 	keyNamePrt := flag.String("KeyName", "", "Key name to use for cluster (Required only if clusterExists is false)")
 	cluserSizePrt := flag.String("ClusterSize", "1", "Number of host machines for cluster (Required only if clusterExists is false)")
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
-	//parse the values
+	//custom cluster parameters
+	ecsLBHostedZoneIDPtr := flag.String("ALBHostedZoneID", "", "Elastic Load Balancer Canonincal Hosted Zone Id, provide if using existing cluster")
+	ecsLBDNSNamePtr := flag.String("ALBDNSName", "", "Elastic Load Balancer DNS Name, provide if using existing cluster")
+	ecsLBDARNPtr := flag.String("ALBARN", "", "Elastic Load Balancer ARN, provide if using existing cluster")
+	ecsLBFullNamePtr := flag.String("ALBFullName", "", "Elastic Load Balancer Full Name, provide if using existing cluster")
+	ecsARNPtr := flag.String("ECSARN", "", "ECS Cluster ARN, provide if using existing cluster")
+	ecsLBListenerARNPtr := flag.String("ECSALBListenerARN", "", "ECS Cluster ARN, provide if using existing cluster")
 
+	//parse the values
 	flag.Parse()
 	args := CommandLineArgs{
-		VPC:              *vpcPtr,
-		VPCName:          *vpcNamePrt,
-		HostedZoneName:   *hostedZonePtr,
-		Image:            *imagePtr,
-		ServiceName:      *serviceNamePtr,
-		ContainerName:    *containerNamePtr,
-		ClusterName:      *clusterNamePtr,
-		ClusterSubnetIDs: *clusterSubnetsPtr,
-		WSSubnetIDs:      *elbSubnetPtr,
-		KeyName:          *keyNamePrt,
-		ClusterSize:      *cluserSizePrt,
-		MaxSize:          *maxSizePrt,
-		InstanceType:     *instanceTypePrt,
-		PortMapping:      *portMappingPtr,
-		Tenant:           *vpcNamePrt,
+		VPC:               *vpcIDPtr,
+		VPCName:           *vpcNamePrt,
+		HostedZoneName:    *hostedZonePtr,
+		Image:             *imagePtr,
+		ServiceName:       *serviceNamePtr,
+		ContainerName:     *containerNamePtr,
+		ClusterName:       *clusterNamePtr,
+		ClusterSubnetIDs:  *clusterSubnetsPtr,
+		WSSubnetIDs:       *elbSubnetPtr,
+		KeyName:           *keyNamePrt,
+		ClusterSize:       *cluserSizePrt,
+		MaxSize:           *maxSizePrt,
+		InstanceType:      *instanceTypePrt,
+		PortMapping:       *portMappingPtr,
+		Tenant:            *vpcNamePrt,
+		EcsLbHostedZoneID: *ecsLBHostedZoneIDPtr,
+		EcsLBDNSName:      *ecsLBDNSNamePtr,
+		EcsLBARN:          *ecsLBDARNPtr,
+		EcsLBFullName:     *ecsLBFullNamePtr,
+		EcsARN:            *ecsARNPtr,
+		EcsLBListenerARN:  *ecsLBListenerARNPtr,
 	}
 	return args
 }
