@@ -20,8 +20,7 @@ aws cloudformation delete-stack --stack-name "${ServiceName}"
 CONTAINER_NAME=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
---Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
---ClusterName=${ClusterName} --PortMapping=8080
+--Image=${image} --ServiceName=${CONTAINER_NAME} --ClusterName=${ClusterName} --PortMapping=8080
 
 # ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
 # --Image=${image} --ServiceName=${CONTAINER_NAME} --ContainerName=${CONTAINER_NAME} \
@@ -32,16 +31,14 @@ curl --fail https://${CONTAINER_NAME}.vssdevelopment.com/
 CONTAINER_NAME2=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
---Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
---ClusterName=${ClusterName} --PortMapping=8080
+--Image=${image} --ServiceName=${CONTAINER_NAME2} --ClusterName=${ClusterName} --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 
 #now we want to test if we can deploy a new version
 
 ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
---Image=${image2} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
---ClusterName=${ClusterName} --PortMapping=8080
+--Image=${image2} --ServiceName=${CONTAINER_NAME2} --ClusterName=${ClusterName} --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 
@@ -57,8 +54,7 @@ aws cloudformation delete-stack --stack-name "${ClusterName}"
 NEW_CLUSTER=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 ./workdir/amazonian --VPCName=${VPCName} --HostedZoneName=vssdevelopment.com \
---Image=${image} --ServiceName=${CONTAINER_NAME2} --ContainerName=${CONTAINER_NAME2} \
---ClusterName=${NEW_CLUSTER} --PortMapping=8080
+--Image=${image} --ServiceName=${CONTAINER_NAME2} --ClusterName=${NEW_CLUSTER} --PortMapping=8080
 
 curl --fail https://${CONTAINER_NAME2}.vssdevelopment.com/
 source amazonian-output
