@@ -99,10 +99,11 @@ func createArgs() CommandLineArgs {
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
 	//parse the values
+	flag.Parse()
+
 	if *containerNamePtr == "" {
 		*containerNamePtr = *serviceNamePtr
 	}
-	flag.Parse()
 	args := CommandLineArgs{
 		VPC:              *vpcPtr,
 		VPCName:          *vpcNamePrt,
