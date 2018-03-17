@@ -3,6 +3,7 @@ package commandlineargs
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -33,6 +34,14 @@ type CommandLineArgs struct {
 	InstanceType     string
 	PortMapping      string
 	Tenant           string
+	//ECS cluster params
+	ECSClusterARN    string
+	ECSHostedZoneID  string
+	ECSDNSName       string
+	ECSALBArn        string
+	ECSALBListener   string
+	ECSALBFullName   string
+	ECSClusterExists bool
 }
 
 //validateArguments method to validate all required command line args are specified
@@ -51,34 +60,26 @@ func validateArguments(args ...string) error {
 //GenerateArgs is a method to parse command line arguments
 func GenerateArgs() (CommandLineArgs, error) {
 	args := createArgs()
-	//validate arguments
+	//validate general arguments
 	err := validateArguments(args.VPCName, args.Image, args.HostedZoneName, args.ServiceName, args.ContainerName, args.ClusterName, args.PortMapping)
 	//if a required parameter is not specified, log error and exit
 	if err != nil {
 		flag.PrintDefaults()
 		return CommandLineArgs{}, err
 	}
-
+	//validate cluster arguments
+	ecsExist, err := doesECSExist(args)
+	if err != nil {
+		fmt.Printf("Invalid input: If at least one existing ECS parameter is provided, all must be provided")
+		flag.PrintDefaults()
+		return CommandLineArgs{}, err
+	}
+	args.ECSClusterExists = ecsExist
 	return args, nil
 
 }
 
-func createRandomString(starterString string) string {
-	result := starterString + randomString(8)
-	return result
-}
-func randomString(n int) string {
-	rand.Seed(time.Now().UnixNano())
-
-	var letter = []rune(runeString)
-
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letter[rand.Intn(len(letter))]
-	}
-	return string(b)
-}
-
+//Method to grab arguments from command line and convert them to CommandLineArgs struct
 func createArgs() CommandLineArgs {
 	//todo-refactor flags more for unit testing
 	vpcPtr := flag.String("VPCId", "", "VPC to deploy target group. (Required)")
@@ -98,6 +99,15 @@ func createArgs() CommandLineArgs {
 	cluserSizePrt := flag.String("ClusterSize", "1", "Number of host machines for cluster (Required only if clusterExists is false)")
 	maxSizePrt := flag.String("MaxSize", "1", "Max number of host machines cluster can scale to (Required only if clusterExists is false)")
 	instanceTypePrt := flag.String("InstanceType", "t2.medium", "Type of machine. (Required only if clusterExists is false, defaults to t2.medium)")
+
+	//Existing ECS Cluster Params
+	ecsClusterARNPtr := flag.String("ECSClusterARN", "", "AWS ECS Cluster Amazon Resource Name (ARN))")
+	ecsHostedZoneIDPtr := flag.String("ECSALBHostedZoneID", "", "AWS ECS Cluster Application Load Balancer Hosted Zone")
+	ecsALNDNSNamePtr := flag.String("ECSALNDNSName", "", "AWS ECS Cluster Application Load Balancer DNS Name")
+	ecsALBArnPtr := flag.String("ECSALBArn", "", "AWS ECS Cluster Application Load Balancer Amazon Resource Name (ARN)")
+	ecsALBListenerPtr := flag.String("ECSALBListener", "", "AWS ECS Cluster Application Load Balancer Listener")
+	ecsALBFullNamePtr := flag.String("ECSALBFullName", "", "AWS ECS Cluster Application Load Balancer Full Name")
+
 	//parse the values
 	flag.Parse()
 
@@ -120,6 +130,64 @@ func createArgs() CommandLineArgs {
 		InstanceType:     *instanceTypePrt,
 		PortMapping:      *portMappingPtr,
 		Tenant:           *vpcNamePrt,
+		ECSClusterARN:    *ecsClusterARNPtr,
+		ECSHostedZoneID:  *ecsHostedZoneIDPtr,
+		ECSDNSName:       *ecsALNDNSNamePtr,
+		ECSALBArn:        *ecsALBArnPtr,
+		ECSALBListener:   *ecsALBListenerPtr,
+		ECSALBFullName:   *ecsALBFullNamePtr,
 	}
 	return args
+}
+
+//Helper Methods
+
+//Method to create random string to be used to generate auto generated names based on initial name
+func createRandomString(starterString string) string {
+	result := starterString + randomString(8)
+	return result
+}
+
+//Method to create random string
+func randomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+
+	var letter = []rune(runeString)
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+	return string(b)
+}
+
+//Method to check whether one of the inputted parameters exist
+func doAnyParametersExist(args ...string) bool {
+	if args == nil {
+		return false
+	}
+	for _, arg := range args {
+		if arg != "" {
+			return true
+		}
+	}
+	return false
+}
+
+//method to validate ECS Parameters
+func doesECSExist(args CommandLineArgs) (bool, error) {
+	//first, check if any of the existing cluster parameters exist
+	if doAnyParametersExist(args.ECSALBArn, args.ECSALBFullName, args.ECSALBListener,
+		args.ECSClusterARN, args.ECSDNSName, args.ECSHostedZoneID) {
+		//if any of them do, then we require all of them so validate
+		err := validateArguments(args.ECSALBArn, args.ECSALBFullName, args.ECSALBListener,
+			args.ECSClusterARN, args.ECSDNSName, args.ECSHostedZoneID)
+		if err != nil {
+			return false, err
+		}
+
+		return true, nil
+
+	}
+	return false, nil
 }

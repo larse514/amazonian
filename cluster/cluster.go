@@ -49,9 +49,9 @@ type Ecs struct {
 //EcsOutput is the output generated when creating an ECS Cluster via Cloudformation
 type EcsOutput struct {
 	StackName       string
-	ClusterArn      string
+	ECSClusterArn   string
 	ECSHostedZoneID string
-	AlbListener     string
+	ECSAlbListener  string
 	ECSDNSName      string
 	ECSLbArn        string
 	ECSLbFullName   string
@@ -83,17 +83,17 @@ func (ecs Ecs) GetCluster(stackName string) (EcsOutput, error) {
 
 	if err != nil {
 		println("error retrieving stack ", err.Error())
-		return EcsOutput{ClusterArn: ""}, nil
+		return EcsOutput{ECSClusterArn: ""}, nil
 	}
 
 	outputMap := getOutputParameters(&stack)
 	//todo- I know, hard coded convention =/
 	output := EcsOutput{}
-	output.ClusterArn = outputMap[stackName]
+	output.ECSClusterArn = outputMap[stackName]
 	output.ECSHostedZoneID = outputMap[ecsHostedZoneID+"-"+stackName]
 	output.ECSDNSName = outputMap[ecsDNSName+"-"+stackName]
 	output.ECSLbArn = outputMap[ecsLbArn+"-"+stackName]
-	output.AlbListener = outputMap[albListener+"-"+stackName]
+	output.ECSAlbListener = outputMap[albListener+"-"+stackName]
 	output.ECSLbFullName = outputMap[ecsLBFullName+"-"+stackName]
 
 	return output, nil

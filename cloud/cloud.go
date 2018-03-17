@@ -27,6 +27,7 @@ type AWS struct {
 
 //CreateDeployment is method to create networking (VPC, Subnets, etc) for AWS
 func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
+
 	vpc, err := aws.retrieveOrCreateVPC(args)
 
 	if err != nil {
@@ -53,6 +54,10 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 
 //createVPC is a private method used to create an AWS VPC based on passed in argument
 func (aws AWS) retrieveOrCreateVPC(args *commandlineargs.CommandLineArgs) (network.VPCOutput, error) {
+	//if the cluster exists no need to look it up sicne it will also have to exist
+	if args.ECSClusterExists {
+		return network.VPCOutput{}, nil
+	}
 	//attempt to fetch the VPC by it's name
 	vpcStack, err := aws.getVPC(&args.VPCName, &args.Tenant)
 	//if stack name is the empty string then assume stack doesn't exist so create it
@@ -98,32 +103,46 @@ func (aws AWS) getVPC(vpcName *string, tenant *string) (network.VPCOutput, error
 
 //createCluster is a private method to create a cluster if it doesn't exist
 func (aws AWS) retrieveOrCreateCluster(output *network.VPCOutput, args *commandlineargs.CommandLineArgs) (cluster.EcsOutput, error) {
-	//attempt to lookup cluster
-	ecsOuput, err := aws.Ecs.GetCluster(args.ClusterName)
-
-	if ecsOuput.ClusterArn == "" {
-		fmt.Printf("cluster %s does not exist, creating...\n", args.ClusterName)
-		//create cluster
-		ecsInput := cluster.EcsInput{}
-		ecsInput.DomainName = args.HostedZoneName
-		ecsInput.KeyName = args.KeyName
-		ecsInput.VpcID = output.VPCID
-		ecsInput.ClusterSubnetIds = output.CLSubnetIDs
-		ecsInput.WSSubnetIds = output.WSSubnetIDs
-		ecsInput.DesiredCapacity = args.ClusterSize
-		ecsInput.MaxSize = args.MaxSize
-		ecsInput.InstanceType = args.InstanceType
-		ecsInput.ClusterName = args.ClusterName
-		//create cluster
-		err = aws.Ecs.CreateCluster(ecsInput)
-		//attempt to fetch cluster again
-		ecsOuput, err = aws.Ecs.GetCluster(args.ClusterName)
+	//attempt to lookup cluster, right now we're not handling this error so
+	//we won't pretend to set it
+	ecsOuput, _ := aws.Ecs.GetCluster(args.ClusterName)
+	//check if the ECSClusterARN value exists
+	if ecsOuput.ECSClusterArn == "" {
+		//cluster doesn't exist, check if ClusterARN exists, if it does use input values
+		//we're assuming validation has already been done
+		if args.ECSClusterExists {
+			ecsOuput.ECSDNSName = args.ECSDNSName
+			ecsOuput.ECSHostedZoneID = args.ECSHostedZoneID
+			ecsOuput.ECSLbArn = args.ECSALBArn
+			ecsOuput.ECSLbFullName = args.ECSALBFullName
+			ecsOuput.ECSClusterArn = args.ECSClusterARN
+			ecsOuput.ECSAlbListener = args.ECSALBListener
+		} else {
+			//otherwise create the cluster
+			fmt.Printf("cluster %s does not exist, creating...\n", args.ClusterName)
+			//create cluster
+			ecsInput := cluster.EcsInput{}
+			ecsInput.DomainName = args.HostedZoneName
+			ecsInput.KeyName = args.KeyName
+			ecsInput.VpcID = output.VPCID
+			ecsInput.ClusterSubnetIds = output.CLSubnetIDs
+			ecsInput.WSSubnetIds = output.WSSubnetIDs
+			ecsInput.DesiredCapacity = args.ClusterSize
+			ecsInput.MaxSize = args.MaxSize
+			ecsInput.InstanceType = args.InstanceType
+			ecsInput.ClusterName = args.ClusterName
+			//create cluster
+			err := aws.Ecs.CreateCluster(ecsInput)
+			//attempt to fetch cluster again
+			ecsOuput, err = aws.Ecs.GetCluster(args.ClusterName)
+			if err != nil {
+				println("error creating cluster ", err.Error())
+				return cluster.EcsOutput{}, err
+			}
+		}
 
 	}
-	if err != nil {
-		println("error creating cluster ", err.Error())
-		return cluster.EcsOutput{}, err
-	}
+
 	return ecsOuput, nil
 }
 

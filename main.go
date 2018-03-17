@@ -54,6 +54,7 @@ func main() {
 		fmt.Printf("Error encountered when creating deployment %f", err)
 		os.Exit(1)
 	}
+	//format name to lower case since it's an http url
 	serviceName := strings.ToLower(args.ServiceName)
 	url := "https://" + serviceName + "." + args.HostedZoneName
 	err = output.WriteOutputFile(output.Output{FileName: fileName, ServiceName: args.ServiceName, ClusterName: args.ClusterName, ServiceURL: url, VPCId: args.VPC, VPCName: args.VPCName})

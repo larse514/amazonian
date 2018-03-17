@@ -72,7 +72,7 @@ type EcsServiceInput struct {
 //DeployService is a method that creates a service for an ecs service
 func (service EcsService) DeployService(ecs *cluster.EcsOutput, input *EcsServiceInput) error {
 	//Now grab the priority
-	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.AlbListener)
+	priority, err := service.LoadBalancer.GetHighestPriority(&ecs.ECSAlbListener)
 	if err != nil {
 		println("error retrieving latest priority ", err.Error())
 		return err
@@ -142,11 +142,11 @@ func createServiceParameters(ecs *cluster.EcsOutput, service *EcsServiceInput) [
 	parameterMap[containerNameParam] = service.ContainerName
 	parameterMap[portMappingParam] = service.PortMapping
 	//cluster mappings
-	parameterMap[clusterARNParam] = ecs.ClusterArn
+	parameterMap[clusterARNParam] = ecs.ECSClusterArn
 	parameterMap[eLBHostedZoneIDParam] = ecs.ECSHostedZoneID
 	parameterMap[eLBDNSNameParam] = ecs.ECSDNSName
 	parameterMap[eLBARNParam] = ecs.ECSLbArn
-	parameterMap[aLBListenerARNParam] = ecs.AlbListener
+	parameterMap[aLBListenerARNParam] = ecs.ECSAlbListener
 	parameterMap[ecsLBFullNameParam] = ecs.ECSLbFullName
 
 	//now convert the key value map to a list of cloudformation.Parameter 's
