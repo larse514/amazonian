@@ -86,16 +86,16 @@ func TestEcsGetCluster(t *testing.T) {
 
 	output, _ := ecs.GetCluster(stackName)
 
-	if output.ClusterArn != outputParams[0].outputValue {
-		t.Log("mismatch in output key ", output.ClusterArn, " with ", outputParams[0].outputValue)
+	if output.ECSClusterArn != outputParams[0].outputValue {
+		t.Log("mismatch in output key ", output.ECSClusterArn, " with ", outputParams[0].outputValue)
 		t.Fail()
 	}
 	if output.ECSHostedZoneID != outputParams[1].outputValue {
 		t.Log("mismatch in output key ", output.ECSHostedZoneID, " with ", outputParams[1].outputValue)
 		t.Fail()
 	}
-	if output.AlbListener != outputParams[2].outputValue {
-		t.Log("mismatch in output key ", output.AlbListener, " with ", outputParams[2].outputValue)
+	if output.ECSAlbListener != outputParams[2].outputValue {
+		t.Log("mismatch in output key ", output.ECSAlbListener, " with ", outputParams[2].outputValue)
 		t.Fail()
 	}
 	if output.ECSDNSName != outputParams[3].outputValue {
@@ -114,8 +114,8 @@ func TestEcsGetClusterGetParametersNoStacks(t *testing.T) {
 	ecs := Ecs{Resource: mockGoodResourceNoStacks{}}
 
 	output, _ := ecs.GetCluster(stackName)
-	if output.ClusterArn != "" {
-		t.Log("no stacks have been returned, ClusterArn should be \"\"", output.ClusterArn)
+	if output.ECSClusterArn != "" {
+		t.Log("no stacks have been returned, ClusterArn should be \"\"", output.ECSClusterArn)
 		t.Fail()
 	}
 
@@ -126,7 +126,7 @@ func TestEcsGetClusterFails(t *testing.T) {
 
 	output, _ := ecs.GetCluster(stackName)
 
-	if output.ClusterArn != "" {
+	if output.ECSClusterArn != "" {
 		t.Log("ClusterARN not equal to emptry string")
 		t.Fail()
 	}

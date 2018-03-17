@@ -174,10 +174,7 @@ type mockGoodService struct {
 }
 
 func (service mockGoodService) DeployService(ecs *cluster.EcsOutput, input *service.EcsServiceInput) error {
-	expectedVPC := createVPCOutput().VPCID
-	if input.Vpc != expectedVPC {
-		return errors.New("Invlid VPCID returned.  Expected: " + expectedVPC + " but received: " + input.Vpc)
-	}
+
 	return nil
 }
 
@@ -212,6 +209,35 @@ func createECSServiceOutput() *cluster.EcsOutput {
 
 //public method tests
 func TestCreateDeployment(t *testing.T) {
+	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
+
+	args := createCommandLineArgs()
+	args.Tenant = tenant
+	err := cloud.CreateDeployment(args)
+
+	if err != nil {
+		t.Log("Error returned when it shouldn't, ", err.Error())
+		t.Fail()
+	}
+
+}
+func TestCreateDeploymentECSProvided(t *testing.T) {
+	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockBadGetCluster{}, Serv: mockGoodService{}}
+
+	args := createCommandLineArgs()
+
+	args.ECSClusterExists = true
+
+	args.Tenant = tenant
+	err := cloud.CreateDeployment(args)
+
+	if err != nil {
+		t.Log("Error returned when it shouldn't, ", err.Error())
+		t.Fail()
+	}
+
+}
+func TestCreateDeploymentECSParamsProvided(t *testing.T) {
 	cloud := AWS{Vpc: mockGoodVPC{}, Stack: mockGoodStack{}, Ecs: mockGoodCluster{}, Serv: mockGoodService{}}
 
 	args := createCommandLineArgs()

@@ -232,10 +232,25 @@ The following describes the parameters you can use to customize amazonian deploy
 | InstanceType   | Type of EC2 machine                                                    | No       | t2.medium   | Required if cluster and vpc exists                      |
 |                |                                                                        |          |             |                                                         |
 
-An example command of how you might run amazonian can be seen below:
+//add table
 
-`./amazonian --VPCName=amazonian-dev --HostedZoneName=<hostedzonename>.com --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --ClusterName=amazonian-ecs-dev ClusterSize=1 mazSizePrt=1 instanceTypePrt=t2.medium --PortMapping=8080`
+### use your own VPC
 
+Amazonian allows you to use your own VPC.  In order to do so you just need to specify your VPC's VPCID, Public Subnet IDs (for the ALB load balancer), and Cluster Subnet IDs (for ECS cluster).  Amazonian will then create the required ECS cluster infrastructure for you! *(Note- Subnet id's must be a comma separate list)*</br>
+
+
+The following command will spin up an ECS Cluster in your VPC and run the Amazonian hello world container:
+
+`./amazonian --VPCId=<YOUR VPC ID> --ELBSubnets=<Comma Separated SubnetIDs> --ClusterSubnets=<Comma Separated SubnetIDs> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080`
+
+### use your own ECS Cluster
+
+Amazonian also allows you to use your own ECS Cluster, and by default your own VPC since the cluster must exist in a VPC anyway.  In order to do so you just need to specify your VPC's VPCID, Public Subnet IDs (for the ALB load balancer), and Cluster Subnet IDs (for ECS cluster).  Amazonian will then create the required ECS cluster infrastructure for you! *(Note- Subnet id's must be a comma separate list)*</br>
+
+
+The following command will spin up an ECS Cluster in your VPC and run the Amazonian hello world container:
+
+`./amazonian --VPCId=<YOUR VPC ID> --ELBSubnets=<Comma Separated SubnetIDs> --ClusterSubnets=<Comma Separated SubnetIDs> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080`
 
 ## installation
 Eventually the plan is to add this as a commandline tool and distribute it to various targets.  MacOS (Homebrew) Ubuntu (Debian) are the first two targeted OS platform.

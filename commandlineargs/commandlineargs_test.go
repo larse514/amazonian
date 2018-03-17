@@ -74,3 +74,134 @@ func TestCreateArgs(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestValidateECSParametersErrorTrue(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersECSClusterShouldNotExist(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBArn = "NOT EMPTY String"
+
+	exists, _ := doesECSExist(args)
+	if exists {
+		t.Log("ECS Cluster should not exist")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersALBListenerError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBArn = "NOT EMPTY String"
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+}
+
+func TestValidateECSParametersECSALBArnError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersECSHostedZoneIDError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersECSDNSNameError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersClusterArnError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err == nil {
+		t.Log("No error found when one of expected")
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersNoError(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	_, err := doesECSExist(args)
+	if err != nil {
+		t.Log("Error returned when non-expected ", err.Error())
+		t.Fail()
+	}
+
+}
+func TestValidateECSParametersECSClusterExists(t *testing.T) {
+	args := CommandLineArgs{}
+	args.ECSALBFullName = "NOT EMPTY String"
+	args.ECSALBListener = "NOT EMPTY String"
+	args.ECSClusterARN = "NOT EMPTY String"
+	args.ECSDNSName = "NOT EMPTY String"
+	args.ECSHostedZoneID = "NOT EMPTY String"
+	args.ECSALBArn = "NOT EMPTY String"
+
+	exists, _ := doesECSExist(args)
+	if !exists {
+		t.Log("ECS Cluster shoudl exist")
+		t.Fail()
+	}
+
+}
