@@ -245,12 +245,12 @@ The following command will spin up an ECS Cluster in your VPC and run the Amazon
 
 ### use your own ECS Cluster
 
-Amazonian also allows you to use your own ECS Cluster, and by default your own VPC since the cluster must exist in a VPC anyway.  In order to do so you just need to specify your VPC's VPCID, Public Subnet IDs (for the ALB load balancer), and Cluster Subnet IDs (for ECS cluster).  Amazonian will then create the required ECS cluster infrastructure for you! *(Note- Subnet id's must be a comma separate list)*</br>
+Amazonian also allows you to use your own ECS Cluster, and by default your own VPC since the cluster must exist in a VPC anyway.  You will also need an [AWS Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) and associated [Target Group](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html) as well as an [AWS Route 53 Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html). In order to deploy your container you just need to specify your VPC's VPCID; and your AWS ECS Cluster's Amazon Resource Name (ARN), Application Load Balancer (ALB) ARN, ALB DNS Name, ALB Hosted Zone Id, ALB Listener ARN, and ALB Full Name.  Amazonian will then create the required ECS cluster infrastructure for you! *(Note- Subnet id's must be a comma separate list)*</br>
 
 
 The following command will spin up an ECS Cluster in your VPC and run the Amazonian hello world container:
 
-`./amazonian --VPCId=<YOUR VPC ID> --ELBSubnets=<Comma Separated SubnetIDs> --ClusterSubnets=<Comma Separated SubnetIDs> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080`
+`./amazonian --VPCId=<YOUR VPC ID> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080 --ECSClusterARN=<Your Cluster ARN> --ECSALBHostedZoneID=<Your ALB Hosted Zone ID> --ECSALNDNSName=<Your ALB DNS Name> --ECSALBArn=<Your ALB Arn> --ECSALBListener=<Your ALB Listern ARN> --ECSALBFullName=<Your ALB Full Name>`
 
 ## installation
 Eventually the plan is to add this as a commandline tool and distribute it to various targets.  MacOS (Homebrew) Ubuntu (Debian) are the first two targeted OS platform.
