@@ -56,7 +56,7 @@ func (aws AWS) CreateDeployment(args *commandlineargs.CommandLineArgs) error {
 func (aws AWS) retrieveOrCreateVPC(args *commandlineargs.CommandLineArgs) (network.VPCOutput, error) {
 	//if the cluster exists no need to look it up sicne it will also have to exist
 	if args.ECSClusterExists {
-		return network.VPCOutput{}, nil
+		return network.VPCOutput{VPCID: args.VPC}, nil
 	}
 	//attempt to fetch the VPC by it's name
 	vpcStack, err := aws.getVPC(&args.VPCName, &args.Tenant)
