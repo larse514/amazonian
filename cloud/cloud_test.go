@@ -298,3 +298,17 @@ func TestCreateDeploymentDeployServiceFailss(t *testing.T) {
 	}
 
 }
+
+//retrieveOrCreateVPC tests
+func TestRetrieveOrCreateVPC(t *testing.T) {
+	cloud := AWS{}
+	args := commandlineargs.CommandLineArgs{ECSClusterExists: true, VPC: vpc}
+	expected := vpc
+	got, _ := cloud.retrieveOrCreateVPC(&args)
+
+	if got.VPCID != expected {
+		t.Log("got ", got, " expcted ", expected)
+		t.Fail()
+	}
+
+}

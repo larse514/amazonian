@@ -69,6 +69,8 @@ alblistener=`aws cloudformation describe-stacks --stack-name "${NEW_CLUSTER}" --
 ecslbfullname=`aws cloudformation describe-stacks --stack-name "${NEW_CLUSTER}" --query "Stacks[0].[Outputs[? starts_with(OutputKey, 'ecslbfullname')]][0][*].{OutputValue:OutputValue}" --output text`
 vpcId=`aws cloudformation describe-stacks --stack-name "${VPCName}" --query "Stacks[0].[Outputs[? starts_with(OutputKey, 'VPC')]][0][*].{OutputValue:OutputValue}" --output text`
 
+echo "retrived ${vpcId}"
+
 EXISTING_CLUSTER_CONTAINER=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | head -c 5`
 
 ./workdir/amazonian --VPCId=${vpcId} --HostedZoneName=vssdevelopment.com \
