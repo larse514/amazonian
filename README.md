@@ -214,25 +214,28 @@ The last thing you need is a Docker image hosted in a repository.  AWS's [ECR](h
 ### parameters
 The following describes the parameters you can use to customize amazonian deployments.
 
-| Paramater      | Description                                                            | Required | Default     | Note                                                    |
-|----------------|------------------------------------------------------------------------|----------|-------------|---------------------------------------------------------|
-| VPCId          | Target VPC to deploy your containers                                   | Yes      | None        |                                                         |
-| VPCName        | Name of VPC to have amazonian use or create                            | No       | Random Name |                                                         |
-| PortMapping    | Exposed container port                                                 | Yes      | None        |                                                         |
-| HostedZoneName | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None        |                                                         |
-| Image          | Docker Repository Image to be deployed as a container                  | Yes      | None        |                                                         |
-| ServiceName    | Name of container service to be deployed                               | No       | Random Name |                                                         |
-| ContainerName  | Name of container to be deployed                                       | No       | Random Name |                                                         |
-| ClusterName    | Name of ECS Cluster to use                                             | No       | Random Name | This will be expanded to include Fargate and Kubernetes |
-| ClusterSubnets | List of VPC Subnets to deploy cluster to                               | No       | None        | Required if cluster and vpc exists                      |
-| ELBSubnets     | List of VPC Subnets to deploy Load Balancers to                        | No       | None        | Required if cluster and vpc exists                      |
-| KeyName        | Key name to use for EC2 instances within ECS cluster.                  | No       | None        |                                                         |
-| ClusterSize    | Number of host machines for cluster.                                   | No       | 1           |                                                         |
-| MaxSize        | Max number of host machines cluster can scale to                       | No       | 1           |                                                         |
-| InstanceType   | Type of EC2 machine                                                    | No       | t2.medium   | Required if cluster and vpc exists                      |
-|                |                                                                        |          |             |                                                         |
-
-//add table
+| Paramater          | Description                                                            | Required | Default     | Note                                                           |
+|--------------------|------------------------------------------------------------------------|----------|-------------|----------------------------------------------------------------|
+| VPCId              | Target VPC to deploy your containers                                   | Yes      | None        |                                                                |
+| VPCName            | Name of VPC to have amazonian use or create                            | No       | Random Name |                                                                |
+| PortMapping        | Exposed container port                                                 | Yes      | None        |                                                                |
+| HostedZoneName     | Route 53 hosted zone name to use for cluster and container deployments | Yes      | None        |                                                                |
+| Image              | Docker Repository Image to be deployed as a container                  | Yes      | None        |                                                                |
+| ServiceName        | Name of container service to be deployed                               | No       | Random Name |                                                                |
+| ContainerName      | Name of container to be deployed                                       | No       | Random Name |                                                                |
+| ClusterName        | Name of ECS Cluster to use                                             | No       | Random Name | This will be expanded to include Fargate and Kubernetes        |
+| ClusterSubnets     | List of VPC Subnets to deploy cluster to                               | No       | None        | Required if cluster and vpc exists                             |
+| ELBSubnets         | List of VPC Subnets to deploy Load Balancers to                        | No       | None        | Required if cluster and vpc exists                             |
+| KeyName            | Key name to use for EC2 instances within ECS cluster.                  | No       | None        |                                                                |
+| ClusterSize        | Number of host machines for cluster.                                   | No       | 1           |                                                                |
+| MaxSize            | Max number of host machines cluster can scale to                       | No       | 1           |                                                                |
+| InstanceType       | Type of EC2 machine                                                    | No       | t2.medium   | Required if cluster and vpc exists                             |
+| ECSClusterARN      | AWS ECS Cluster Amazon Resource Name                                   | No       | None        | If provided, all other ECS Parameters must be provided as well |
+| ECSALBHostedZoneID | AWS Application Load Balancer Hosted Zone Id                           | No       | None        | If provided, all other ECS Parameters must be provided as well |
+| ECSALBDNSName      | AWS ALB DNS Name                                                       | No       | None        | If provided, all other ECS Parameters must be provided as well |
+| ECSALBArn          | AWS ALB Amazon Resource Name                                           | No       | None        | If provided, all other ECS Parameters must be provided as well |
+| ECSALBListener     | AWS ALB Listener ARN                                                   | No       | None        | If provided, all other ECS Parameters must be provided as well |
+| ECSALBFullName     | AWS ALB Full Name                                                      | No       | None        | If provided, all other ECS Parameters must be provided as well |
 
 ### use your own VPC
 
@@ -250,7 +253,7 @@ Amazonian also allows you to use your own ECS Cluster, and by default your own V
 
 The following command will spin up an ECS Cluster in your VPC and run the Amazonian hello world container:
 
-`./amazonian --VPCId=<YOUR VPC ID> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080 --ECSClusterARN=<Your Cluster ARN> --ECSALBHostedZoneID=<Your ALB Hosted Zone ID> --ECSALNDNSName=<Your ALB DNS Name> --ECSALBArn=<Your ALB Arn> --ECSALBListener=<Your ALB Listern ARN> --ECSALBFullName=<Your ALB Full Name>`
+`./amazonian --VPCId=<YOUR VPC ID> --HostedZoneName=<hostedzonename> --Image=larse514/gohelloworldservicecontainer:latest --ServiceName=Hello --ContainerName=Hello --PortMapping=8080 --ECSClusterARN=<Your Cluster ARN> --ECSALBHostedZoneID=<Your ALB Hosted Zone ID> --ECSALBDNSName=<Your ALB DNS Name> --ECSALBArn=<Your ALB Arn> --ECSALBListener=<Your ALB Listern ARN> --ECSALBFullName=<Your ALB Full Name>`
 
 ## installation
 Eventually the plan is to add this as a commandline tool and distribute it to various targets.  MacOS (Homebrew) Ubuntu (Debian) are the first two targeted OS platform.

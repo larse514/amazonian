@@ -103,7 +103,7 @@ func createArgs() CommandLineArgs {
 	//Existing ECS Cluster Params
 	ecsClusterARNPtr := flag.String("ECSClusterARN", "", "AWS ECS Cluster Amazon Resource Name (ARN))")
 	ecsHostedZoneIDPtr := flag.String("ECSALBHostedZoneID", "", "AWS ECS Cluster Application Load Balancer Hosted Zone")
-	ecsALNDNSNamePtr := flag.String("ECSALNDNSName", "", "AWS ECS Cluster Application Load Balancer DNS Name")
+	ecsALNDNSNamePtr := flag.String("ECSALBDNSName", "", "AWS ECS Cluster Application Load Balancer DNS Name")
 	ecsALBArnPtr := flag.String("ECSALBArn", "", "AWS ECS Cluster Application Load Balancer Amazon Resource Name (ARN)")
 	ecsALBListenerPtr := flag.String("ECSALBListener", "", "AWS ECS Cluster Application Load Balancer Listener")
 	ecsALBFullNamePtr := flag.String("ECSALBFullName", "", "AWS ECS Cluster Application Load Balancer Full Name")

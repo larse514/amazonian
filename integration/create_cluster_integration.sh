@@ -75,7 +75,7 @@ EXISTING_CLUSTER_CONTAINER=`cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f' | hea
 
 ./workdir/amazonian --VPCId=${vpcId} --HostedZoneName=vssdevelopment.com \
 --Image=${image} --ServiceName=${EXISTING_CLUSTER_CONTAINER} --ClusterName=${NEW_CLUSTER} --PortMapping=8080 \
---ECSClusterARN=${ecsclusterarn} --ECSALBHostedZoneID=${ecslbhostedzoneid} --ECSALNDNSName=${ecslbdnsname} \
+--ECSClusterARN=${ecsclusterarn} --ECSALBHostedZoneID=${ecslbhostedzoneid} --ECSALBDNSName=${ecslbdnsname} \
 --ECSALBArn=${ecslbarn} --ECSALBListener=${alblistener} --ECSALBFullName=${ecslbfullname}
 
 curl --fail https://${EXISTING_CLUSTER_CONTAINER}.vssdevelopment.com/
