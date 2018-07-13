@@ -7,8 +7,6 @@ jobs:
     working_directory: /go/src/github.com/larse514/amazonian
     docker:
       - image: larse514/circleci-golang:latest
-    # environment:
-    #   - BUCKET_NAME: "moodle.sites.lambda.deployment"
     environment:
       TEST_RESULTS: /tmp/test-results
       IMAGE: larse514/gohelloworldservicecontainer:latest
