@@ -20,7 +20,7 @@ Amazonian leverages cutting edge aws serivces to provide: <br />
 * **TLS Certificate Management**
 * **Securely Provisioned Networks**
 
-These enable you to focus on growing your business, not maintaining servers.  Here's how:
+These enable you to focus on growing your business, not maintaining servers.  Here's how :
 
 ### Realtime Monitoring and Application Metrics- AWS Cloudwatch
 AWS Cloudwatch offers realtime monitoring and metrics through the use of alarms, metrics, and dashboards.  These are setup through direct integrations with AWS services leveraged by amazonian. <br/>
